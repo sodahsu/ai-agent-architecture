@@ -2,13 +2,13 @@
 
 一套以隱私安全為前提，用來設計多代理 AI 工作空間的參考架構、方法論，以及可公開重用的 Agent / Skill 契約。
 
-這個 repository 關注的是**系統如何被設計與治理**，而不是公開任何人的真實 AI 記憶、帳號、裝置、私人 repository、憑證或實際運作脈絡。
+這個 repository 關注的是**系統如何被設計、分層、治理與安全安裝**，而不是公開任何人的真實 AI 記憶、私人帳號、裝置、Private Repository、Credential 或 Production Context。
 
 > **核心原則：公開方法，不公開私人 AI 大腦。**
 
 ## 快速安裝
 
-目前支援 Claude Code 與 Codex。安裝器目前仍在 Draft PR 分支中，**合併到 `main` 後即可直接從公開預設分支安裝**。
+目前支援 Claude Code 與 Codex。安裝器仍在 Draft PR 分支中；合併到 `main` 後即可從公開預設分支安裝。
 
 ```bash
 git clone https://github.com/sodahsu/ai-agent-architecture.git
@@ -27,23 +27,40 @@ Codex：
 bash scripts/install.sh --adapter codex --target /path/to/project
 ```
 
-安裝器會把公開核心放進目標專案的 `.ai-agent-architecture/`，並安全建立或整合 `CLAUDE.md` / `AGENTS.md`。若入口檔已存在，不會覆蓋使用者原有內容。
+安裝器會把公開核心放進目標專案的 `.ai-agent-architecture/`。若 `CLAUDE.md` / `AGENTS.md` 已存在、已被使用者修改，或本身是 symlink，都不會被覆蓋；改以 Integration Template 交給使用者人工整合。
 
-完整說明見 [INSTALL.md](INSTALL.md)。
+完整規則見 [INSTALL.md](INSTALL.md)。
 
-自測：
+## 本機驗證
+
+維護者完整檢查：
+
+```bash
+bash scripts/check.sh
+```
+
+它會執行：
+
+- Shell syntax check
+- Installer / Uninstaller regression tests
+- Privacy leak pattern check
+- Agent / Skill Contract 結構檢查
+- OpenSpec / 必要文件存在性檢查
+
+單獨測試：
 
 ```bash
 bash scripts/test-install.sh
+bash scripts/privacy-check.sh
 ```
 
 ## 先理解架構層級
 
-這個專案包含六倉、Agent、Skill、Governance、Workflow、Artifact 等概念，但它們**不是同一層級**。
+六倉、Agent、Skill、Governance、Workflow、Artifact **不是同一層級**。
 
 ```text
-Level 0  系統邊界
-         Private / Public
+Level 0  System Boundary
+         Public / Private
 
 Level 1  Repository Architecture
          六倉＝系統級責任分區
@@ -51,72 +68,109 @@ Level 1  Repository Architecture
 Level 2  Operating Model
          Agent / Skill / Tool＝倉內如何判斷與執行
 
-         Governance＝橫跨所有層級的控制面
-
 Level 3  Workflow
          Intent → Context → Routing → Execution → Validation → Approval → Handoff
 
 Level 4  Artifact / Contract
-         不同角色與 Repository 之間交換資訊的介面
+         不同角色與 Repository 交換資訊的介面
+
+Governance
+         橫跨 Level 0～4 的控制面
 ```
 
-最重要的區分是：
+最重要的區分：
 
 ```text
 Repository  = 責任放在哪裡
 Agent       = 誰負責判斷與協調
-Skill       = 怎麼按照穩定程序執行
-Tool        = 實際對外部系統產生操作
-Workflow    = 工作按照什麼順序流動
-Artifact    = 不同角色之間交換什麼
-Governance  = 以上所有行為哪些被允許
+Skill       = 如何依穩定程序執行
+Tool        = 實際操作能力
+Workflow    = 工作如何流動
+Artifact    = 角色之間交換什麼
+Governance  = 以上行為哪些被允許
 ```
 
 完整說明見 [架構層級模型](docs/architecture/layer-model.md)。
 
-## 從這裡開始
-
-建議閱讀順序：
-
-1. [架構層級模型](docs/architecture/layer-model.md) — 先理解六倉、Agent、Skill、Governance、Workflow、Artifact 彼此的上下層關係。
-2. [架構視覺圖](docs/architecture/visual-map.md) — 看整體系統、公開／私有邊界與控制迴路。
-3. [六倉架構模式](docs/architecture/six-repository-pattern.md) — 將知識、代理控制、評估、執行、實驗與作品集責任拆開。
-4. [跨倉資料流](docs/architecture/data-flow.md) — 定義哪些 artifact 可以跨倉交換，以及哪些資訊必須保持私有。
-5. [Agent / Skill / Governance 模型](docs/architecture/agent-skill-governance.md) — 分離判斷、可重複程序、工具權限與批准機制。
-6. [公開 Agent 套件](agents/README.md) — 可直接採用或改造的 Coordinator / Implementer / Reviewer / Evaluator 角色契約。
-7. [公開 Skill 套件](skills/README.md) — 可重用的 Task Contract、Bounded Implementation、Evidence Review、Privacy Sanitizer、Handoff 與 Capability Evaluation。
-8. [Adapter Layer](adapters/README.md) — 把同一套核心 Contract 映射到 Claude Code 與 Codex。
-9. [安裝指南](INSTALL.md) — 安裝、更新、解除安裝與入口保護規則。
-10. [Agent 工作方法](docs/methodology/agent-workflow.md) — 目標 → 路由 → 執行 → 驗證 → 批准 → 交接。
-11. [匿名功能交付範例](examples/feature-delivery.md) — 使用完全虛構的情境走完一次完整流程。
-12. [公開／私有邊界](docs/governance/public-private-boundary.md) — 如何把私人實作經驗萃取成可公開的方法。
-13. [隱私規範](PRIVACY.md) — 明確列出不可提交到公開 repository 的內容。
-
-## 可直接公開使用的 Agent / Skill
-
-### Agents
+## 六倉責任模式
 
 ```text
-Coordinator  → 目標、Scope、Routing、Assignment、Approval Gate
-Implementer  → 在受限 Scope 內執行，產出 Validation Evidence
-Reviewer     → Read-only 獨立審查 Acceptance Criteria 與 Evidence
-Evaluator    → 評估外部 Skill / Tool / MCP 是否可 Adopt / Adapt / Reject
+1. Knowledge Repository      私人知識與 canonical context
+2. Agent Control Repository  穩定規則、Agent、Skill、Routing、Governance
+3. Evaluation Repository     外部 Skill / Tool / MCP 的隔離評估
+4. Execution Repository      非同步任務與 Automation Runtime
+5. Lab Repository            公開實驗、技術筆記與學習
+6. Portfolio Repository      精選成果與 Case Study
 ```
 
-這些角色定義放在 [`agents/`](agents/README.md)，不綁定 Claude、Codex、Gemini 或其他特定模型。
+六個 Repository 代表的是 **Level 1 架構角色**，不是六個固定產品名稱、六個 Workflow Step，也不是六個 Agent。較小系統可以合併角色，只要責任、Privacy Boundary 與 Lifecycle 邊界仍然清楚。
 
-### Skills
+詳細說明見 [六倉架構模式](docs/architecture/six-repository-pattern.md)。
+
+## 倉內運作模型
+
+任務進入 Agent Control / Execution 後，才進入 Level 2：
 
 ```text
-task-contract           → 把模糊需求轉成可執行契約
-bounded-implementation  → 做最小、安全、可逆的變更
-evidence-review         → 依證據與驗收條件做審查
-privacy-sanitizer       → 把私人經驗去識別化成公開方法
-handoff                 → 產出下一個角色可直接接手的狀態
+Agent
+  ↓ 選擇 / 協調
+Skill
+  ↓ 使用
+Tool
+  ↓
+Files / APIs / Git / Browser / Test Runner
+```
+
+Governance 不是最後一步，而是從旁限制整條鏈：
+
+```text
+                 Governance
+        ┌────────────┼────────────┐
+        ↓            ↓            ↓
+      Agent        Skill         Tool
+```
+
+**Capability 不等於 Permission。** Agent 能做某件事，不代表它已被授權執行。
+
+## 可公開使用的 Agents
+
+[`agents/`](agents/README.md) 提供四個平台中立角色契約：
+
+```text
+Coordinator  → Goal、Scope、Routing、Assignment、Approval Gate
+Implementer  → 在受限 Scope 內實作並產出 Validation Evidence
+Reviewer     → Read-only 獨立驗證 Acceptance Criteria 與 Evidence
+Evaluator    → 評估 Skill / Tool / MCP 的 adopt / adapt / reject / defer
+```
+
+## 可公開使用的 Skills
+
+[`skills/`](skills/README.md) 目前提供：
+
+```text
+task-contract           → 模糊需求轉成可執行契約
+bounded-implementation  → 最小、安全、可逆實作
+evidence-review         → 依 Evidence 與驗收條件審查
+privacy-sanitizer       → 私人經驗去識別化成公開方法
+handoff                 → 產出下一角色可直接接手的狀態
 capability-evaluation   → 評估新 AI 能力的採用與晉升條件
 ```
 
-每個 Skill 都定義 `Purpose / Inputs / Outputs / Preconditions / Permissions / Procedure / Validation / Failure Conditions / Completion Criteria`，可直接轉成不同 Agent Runtime 的 Skill 格式。
+每個 Skill 都定義：
+
+```text
+Purpose
+Inputs
+Outputs
+Preconditions
+Permissions
+Procedure
+Validation
+Failure Conditions
+Completion Criteria
+```
+
+Skill Contract 是程序真相源，不綁定特定模型供應商。
 
 ## Adapter Layer
 
@@ -131,138 +185,12 @@ Claude Code        Codex
 CLAUDE.md          AGENTS.md
 ```
 
-Adapter 只處理平台入口與載入方式，不複製完整 Skill Procedure，因此能避免 Claude / Codex 兩份規則逐漸漂移。
+Adapter 只處理平台入口與載入方式，不重寫完整 Agent / Skill Procedure，避免規則 drift。
 
 目前：
 
-- `adapters/claude-code/`
-- `adapters/codex/`
-
-## 這個 repository 要說明什麼
-
-- 如何把私人記憶與公開架構分離
-- 六倉的責任層級與彼此邊界
-- Agent、Skill、Tool、Workflow 與 Governance 如何分工
-- 如何在多個 AI Agent 之間派工，而不是把所有權限交給每一個 Agent
-- 如何透過明確 Artifact Contract 交換上下文，而不是直接傾倒完整記憶
-- 如何建立 Handoff、Review Gate 與 Human Approval 邊界
-- 如何在新 Skill 或外部工具進入穩定工作流之前先做評估
-- 如何分離同步互動、非同步執行、知識、實驗、發布與作品集層
-- 如何把私人運作經驗轉成不含個資的公開模式與範例
-
-## 參考架構
-
-```mermaid
-flowchart TB
-    subgraph PRIVATE[私有運作層]
-        K[Knowledge\n私人知識真相源]
-        C[Agent Control\n規則、路由、穩定 Skills]
-        X[Execution\n非同步任務與自動化]
-    end
-
-    subgraph CONTROL[受控晉升邊界]
-        E[Evaluation\n評估外部能力]
-        G{{Governance\n隱私 · 權限 · 驗證}}
-    end
-
-    subgraph PUBLIC[公開證據層]
-        L[Lab\n實驗與文章]
-        P[Portfolio\n精選成果]
-    end
-
-    K -->|最小必要上下文| C
-    E -->|採用 / 改造| G
-    G -->|核准能力| C
-    C -->|有邊界的任務| X
-    X -->|結果 + 證據| C
-    C -->|去識別化洞察| L
-    L -->|精選證據| P
-```
-
-六個 repository 代表的是**Level 1 的架構角色**，不是六個 Workflow Step，也不是六個 Agent。真正重要的是責任、資訊流與權限邊界。
-
-## 倉內運作模型
-
-當任務進入 Agent Control / Execution 之後，才進入 Level 2：
-
-```text
-Agent
-  ↓ 選擇 / 協調
-Skill
-  ↓ 使用
-Tool
-  ↓
-Files / APIs / Git / Browser / Test Runner
-```
-
-Governance 不在這條線的最後，而是從旁限制整條鏈：
-
-```text
-                 Governance
-        ┌────────────┼────────────┐
-        ↓            ↓            ↓
-      Agent        Skill         Tool
-```
-
-因此，一個能力很強的 Agent，不代表它自動擁有所有操作權。
-
-## Repository 結構
-
-```text
-agents/
-├── README.md
-├── coordinator.md
-├── implementer.md
-├── reviewer.md
-└── evaluator.md
-
-skills/
-├── README.md
-├── task-contract/SKILL.md
-├── bounded-implementation/SKILL.md
-├── evidence-review/SKILL.md
-├── privacy-sanitizer/SKILL.md
-├── handoff/SKILL.md
-└── capability-evaluation/SKILL.md
-
-adapters/
-├── README.md
-├── claude-code/
-│   ├── README.md
-│   └── CLAUDE.md
-└── codex/
-    ├── README.md
-    └── AGENTS.md
-
-scripts/
-├── install.sh
-├── uninstall.sh
-└── test-install.sh
-
-docs/
-├── architecture/
-│   ├── layer-model.md
-│   ├── visual-map.md
-│   ├── six-repository-pattern.md
-│   ├── system-overview.md
-│   ├── data-flow.md
-│   └── agent-skill-governance.md
-├── methodology/
-│   └── agent-workflow.md
-└── governance/
-    └── public-private-boundary.md
-
-examples/
-├── README.md
-└── feature-delivery.md
-
-templates/
-└── workspace.example.yaml
-
-INSTALL.md
-PRIVACY.md
-README.md
-```
+- [`adapters/claude-code/`](adapters/claude-code/README.md)
+- [`adapters/codex/`](adapters/codex/README.md)
 
 ## 方法濃縮成一條流程
 
@@ -284,38 +212,105 @@ Reviewable Output
 Sanitized Learning
 ```
 
-這條流程描述的是 **Level 3 Workflow**；其中的 `Context Contract`、`Assignment Brief`、`Execution Evidence` 等則屬於 **Level 4 Artifact Contract**。
+這是 **Level 3 Workflow**；其中 `Context Contract`、`Assignment Brief`、`Execution Evidence` 等屬於 **Level 4 Artifact Contract**。
 
-## 隱私規則
+詳細資料流見 [跨倉資料流](docs/architecture/data-flow.md)。
 
-禁止提交：
+## 公開／私有邊界
 
-- 個人記憶或對話紀錄
-- 真實 Email、電話、姓名或帳號識別資訊
-- API Key、Token、Cookie、密碼或其他 Secret
-- 私有 repository 名稱或內部 URL
-- 雇主、客戶或機密專案資訊
-- 本機絕對路徑、hostname、IP 或裝置識別資訊
-- Production integration 的真實設定
+禁止把下列內容帶進這個公開 repository：
 
-公開範例必須使用虛構名稱、泛化路徑、placeholder identifier 與不可回推真實身份的情境。
+- 個人記憶、私人對話或私人 prompt
+- 非必要的真實 Email、電話、地址或私人 Account Identifier
+- Private Repository / Issue / PR / Internal URL
+- Employer / Client / Confidential Project Context
+- API Key、Token、Cookie、Password、Credential、Webhook Secret
+- 本機絕對路徑、Hostname、IP、SSH 或 Device Identifier
+- Production Configuration
 
-新增內容前請先閱讀 [PRIVACY.md](PRIVACY.md)。
+本專案本身刻意公開的 repository 名稱與 Clone URL 可用於安裝文件；不應藉此加入其他私人識別資訊。
+
+詳細規則見 [PRIVACY.md](PRIVACY.md) 與 [Public / Private Boundary](docs/governance/public-private-boundary.md)。
+
+## Repository 結構
+
+```text
+AGENTS.md
+README.md
+INSTALL.md
+PRIVACY.md
+
+agents/
+skills/
+adapters/
+
+docs/
+├── architecture/
+├── methodology/
+└── governance/
+
+examples/
+templates/
+
+scripts/
+├── install.sh
+├── uninstall.sh
+├── test-install.sh
+├── privacy-check.sh
+└── check.sh
+
+openspec/
+├── project.md
+└── changes/
+    └── public-architecture-foundation/
+```
+
+## 開發規範
+
+維護本專案時先讀 [AGENTS.md](AGENTS.md)。非簡單架構、Governance、Installer 或 Agent / Skill Contract 變更，應同步更新 [`openspec/`](openspec/project.md)。
+
+基本原則：
+
+- 不直接修改 `main`
+- KISS，不做無關重構
+- Public-safe synthetic examples only
+- 相關測試與 Privacy Check 通過後才進人工 merge review
+- 不自動 Merge / Deploy / Secret / Billing / destructive action
+
+## 建議閱讀順序
+
+1. [架構層級模型](docs/architecture/layer-model.md)
+2. [架構視覺圖](docs/architecture/visual-map.md)
+3. [六倉架構模式](docs/architecture/six-repository-pattern.md)
+4. [跨倉資料流](docs/architecture/data-flow.md)
+5. [Agent / Skill / Governance 模型](docs/architecture/agent-skill-governance.md)
+6. [公開 Agent 套件](agents/README.md)
+7. [公開 Skill 套件](skills/README.md)
+8. [Adapter Layer](adapters/README.md)
+9. [安裝指南](INSTALL.md)
+10. [Agent 工作方法](docs/methodology/agent-workflow.md)
+11. [匿名功能交付範例](examples/feature-delivery.md)
+12. [公開／私有邊界](docs/governance/public-private-boundary.md)
+13. [隱私規範](PRIVACY.md)
 
 ## 目前狀態
 
-目前已定義第一版公開參考架構與可重用契約，包括：
+第一版已包含：
 
-- 架構層級模型
-- 六倉責任模式
-- 公開／私有邊界
-- 跨倉資料流
+- 架構層級模型與六倉責任模式
+- Public / Private Boundary
+- Cross-Repository Data Flow
 - Agent / Skill / Tool / Governance 模型
-- Workflow 與 Artifact Contract
-- 4 個公開 Agent 角色
+- 4 個公開 Agent Contract
 - 6 個公開 Skill Contract
 - Claude Code / Codex Adapter
-- 安裝、更新、解除安裝與自測腳本
-- 第一個匿名端到端範例
+- 安裝、更新、解除安裝與回歸測試
+- Privacy Check 與統一 Validation Entry
+- OpenSpec project / change baseline
+- Synthetic end-to-end example
 
-目前公開內容不包含真實 Production Runtime、私人系統設定或 Credential。
+目前不包含真實 Production Runtime、私人系統設定或 Credential。
+
+### License 狀態
+
+正式對外 Release 前仍需選定 License。這是法律／授權決策，本專案目前不預設 MIT、Apache-2.0 或其他授權條款。
