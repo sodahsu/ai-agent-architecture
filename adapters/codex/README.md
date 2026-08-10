@@ -15,14 +15,16 @@ Codex Adapter 只負責：
 
 ## 建議讀取順序
 
+安裝後：
+
 ```text
 AGENTS.md
   ↓
-README.md / docs/architecture/layer-model.md
+.ai-agent-architecture/docs/architecture/layer-model.md
   ↓
-agents/<role>.md
+.ai-agent-architecture/agents/<role>.md
   ↓
-skills/<name>/SKILL.md
+.ai-agent-architecture/skills/<name>/SKILL.md
   ↓
 Governance / Privacy Rules
 ```
@@ -62,9 +64,19 @@ Skill 是真正的程序真相源；`AGENTS.md` 不應重寫完整 Skill Procedu
 
 ## 安裝方式
 
-最簡單的方式是把 `AGENTS.md` 範本放到目標專案根目錄，並讓專案可以讀取本架構的 `agents/`、`skills/` 與 Governance 文件。
+```bash
+bash scripts/install.sh --adapter codex --target /path/to/project
+```
 
-可以使用 copy、submodule、subtree 或其他版本固定方式。若需要專案專屬規則，應新增一層 local/private override，而不是修改公開核心來塞入私人資訊。
+安裝器會：
+
+1. 把公開核心放進 `.ai-agent-architecture/`
+2. 若專案沒有 `AGENTS.md`，建立受管理入口
+3. 若已有 `AGENTS.md`，保留原檔並產生 `.ai-agent-architecture/AGENTS.integration.md`
+
+不會自動 Commit、Push 或修改 Git remote。
+
+若需要專案專屬規則，應放在使用者自己的私有設定或既有入口中，而不是修改公開核心來塞入私人資訊。
 
 ## 隱私
 
