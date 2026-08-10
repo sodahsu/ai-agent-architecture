@@ -1,7 +1,7 @@
 <!-- ai-agent-architecture-managed -->
 # Codex Adapter Entrypoint
 
-本檔是公開、安全、平台轉接用途的範本。
+本檔是公開、安全、平台轉接用途的範本。Adapter 只負責載入與路由，不維護第二份 Agent / Skill 清單。
 
 ## Architecture
 
@@ -13,27 +13,22 @@
 
 ## Agent Roles
 
-依任務責任使用：
+先讀 `.ai-agent-architecture/agents/README.md`，再依任務選擇最小必要角色契約。
 
-- 規劃、拆解、Routing、Approval Gate → `.ai-agent-architecture/agents/coordinator.md`
-- 有明確 Scope 的實作 → `.ai-agent-architecture/agents/implementer.md`
-- Acceptance Criteria / Evidence 獨立審查 → `.ai-agent-architecture/agents/reviewer.md`
-- 外部 Skill / Tool / MCP 導入判斷 → `.ai-agent-architecture/agents/evaluator.md`
+Agent 分成兩個維度：
 
-角色是責任與權限契約，不要求特定平台原生 Agent 機制。同一個 Session 可以依 Workflow 切換角色，但每次切換都必須遵守對應 Permission Boundary。
+- Lifecycle Agent：負責 Coordinator / Implementer / Reviewer / Evaluator 等工作生命週期責任。
+- Domain Agent：負責 Design / Product / People 等領域判斷與 Skill Routing。
+
+Domain Agent 不會因專業判斷而自動取得 Implementer 的寫入權；需要寫入時仍必須遵守 Lifecycle Assignment 與 Permission Boundary。
+
+角色是責任與權限契約，不要求特定平台原生 Agent 機制。同一個 session 可以依 Workflow 切換責任，但同一 session 的 Reviewer 只能標記為 structured self-review；只有在不同 reviewer / context 未受原實作推理影響時，才可稱為 independent review。
 
 ## Skill Routing
 
 非簡單任務先讀 `.ai-agent-architecture/skills/README.md`，選擇最小匹配 Skill，完整讀取對應 `SKILL.md` 後再執行。
 
-目前公開 Skills：
-
-- `.ai-agent-architecture/skills/task-contract/SKILL.md`
-- `.ai-agent-architecture/skills/bounded-implementation/SKILL.md`
-- `.ai-agent-architecture/skills/evidence-review/SKILL.md`
-- `.ai-agent-architecture/skills/privacy-sanitizer/SKILL.md`
-- `.ai-agent-architecture/skills/handoff/SKILL.md`
-- `.ai-agent-architecture/skills/capability-evaluation/SKILL.md`
+不要在 Adapter 內手寫完整 Skill inventory；`skills/README.md` 與實際 `skills/*/SKILL.md` 是公開能力的索引與程序真相源。
 
 Skill Contract 的 Preconditions、Permissions、Procedure、Validation、Failure Conditions 與 Completion Criteria 為執行邊界。
 
