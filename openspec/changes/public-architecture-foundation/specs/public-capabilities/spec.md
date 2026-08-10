@@ -21,6 +21,34 @@ Public Agent MUST 區分 Lifecycle Responsibility 與 Domain Routing，避免把
 - THEN Domain Agent MUST NOT 因此自動取得 Implementer 權限
 - AND 寫入仍 MUST 經 Lifecycle Assignment / Permission Boundary
 
+## Requirement: Review independence is not overstated
+
+同一 session 切換 Reviewer 視角 MUST NOT 被描述成 independent review。
+
+### Scenario: Same-session review
+
+- GIVEN Implementer 與 Reviewer 使用相同 session / context
+- WHEN Reviewer 重新檢查 Evidence
+- THEN Review Mode MUST 標記為 `structured-self-review`
+- AND MUST NOT 宣稱 reviewer independence
+
+### Scenario: Independent review
+
+- GIVEN Reviewer 使用與原實作推理隔離的 reviewer / context
+- WHEN Reviewer 依相同 Task Contract 與 Evidence 審查
+- THEN MAY 標記為 `independent`
+
+## Requirement: People decision boundary
+
+People Agent MUST NOT 用 AI 分數、排序、風險標籤或敏感屬性推論自動選擇員工或候選人。
+
+### Scenario: Employment-related routing
+
+- WHEN People Coordinator 處理 Hiring / Promotion / Performance 等工作
+- THEN MUST 把 AI 限制在資料整理、Evidence / Observation 分離與決策準備
+- AND 最終人事判斷 MUST 保留給人類
+- AND MUST NOT 建立自動化候選人／員工 ranking
+
 ## Requirement: Public Skill contract
 
 每個 Public Skill MUST 包含：
@@ -40,6 +68,7 @@ Public Agent MUST 區分 Lifecycle Responsibility 與 Domain Routing，避免把
 - WHEN 維護者執行 `bash scripts/check.sh`
 - THEN 所有 `skills/*/SKILL.md` MUST 通過 Contract heading 檢查
 - AND 所有 `agents/*.md`（README 除外）MUST 通過 Agent Contract heading 檢查
+- AND capability count MUST 由實際檔案動態計算，不得把目前數量當成固定 registry
 
 ## Requirement: Private-runtime capabilities stay excluded
 
@@ -74,3 +103,14 @@ Installer MUST 複製目前公開 `agents/` 與 `skills/` 真相源，而不是�
 - WHEN 使用者重新安裝相同 Adapter
 - THEN 新能力 MUST 隨 `agents/` / `skills/` 一起被安裝
 - AND Adapter MUST NOT 需要複製該能力的完整 Procedure
+
+## Requirement: Adapter discovery uses canonical indexes
+
+Adapter MUST 透過 `agents/README.md` 與 `skills/README.md` 發現 Public Core，不得手寫一份完整 capability list。
+
+### Scenario: Public capability grows
+
+- GIVEN 新 Agent / Skill 已加入 canonical index
+- WHEN Adapter 入口被使用
+- THEN 使用者／Agent MUST 能從 canonical index 發現新能力
+- AND Adapter entry 本身 SHOULD NOT 因新增能力而需要同步更新清單
