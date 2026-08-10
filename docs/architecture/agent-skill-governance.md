@@ -1,26 +1,26 @@
-# Agent / Skill / Governance Model
+# Agent / Skill / Governance 模型
 
-A multi-agent system becomes easier to reason about when three concerns are separated:
+多代理系統要容易理解與維護，應該把三種責任分開：
 
-- **Agents decide and coordinate.**
-- **Skills define repeatable execution procedures.**
-- **Governance constrains what both are allowed to do.**
+- **Agent 負責判斷與協調。**
+- **Skill 負責可重複的執行程序。**
+- **Governance 限制 Agent 與 Skill 被允許做什麼。**
 
-Governance is not a fourth execution layer. It is a cross-cutting control plane that limits routing, permissions, mutation, validation, and approval.
+Governance 不是第四個執行層，而是一個橫跨整個系統的控制平面（control plane），負責限制 Routing、Permission、Mutation、Validation 與 Approval。
 
-## Model
+## 模型
 
 ```mermaid
 flowchart TB
-    G[Governance control plane\npermissions · risk · approval · validation]
+    G[Governance Control Plane\n權限 · 風險 · 批准 · 驗證]
 
-    subgraph DECISION[Decision layer]
+    subgraph DECISION[決策層]
         A1[Router / Coordinator]
         A2[Specialist Agent]
         A3[Reviewer Agent]
     end
 
-    subgraph EXECUTION[Execution layer]
+    subgraph EXECUTION[執行層]
         S1[Skill: inspect]
         S2[Skill: implement]
         S3[Skill: test]
@@ -39,37 +39,37 @@ flowchart TB
     S3 --> T
     S4 --> T
 
-    G -. constrains .-> A1
-    G -. constrains .-> A2
-    G -. constrains .-> A3
-    G -. constrains .-> S1
-    G -. constrains .-> S2
-    G -. constrains .-> S3
-    G -. constrains .-> S4
-    G -. constrains .-> T
+    G -. 約束 .-> A1
+    G -. 約束 .-> A2
+    G -. 約束 .-> A3
+    G -. 約束 .-> S1
+    G -. 約束 .-> S2
+    G -. 約束 .-> S3
+    G -. 約束 .-> S4
+    G -. 約束 .-> T
 ```
 
-## Responsibility boundaries
+## 責任邊界
 
 ### Agent
 
-An agent owns judgment within a bounded responsibility.
+Agent 在明確責任範圍內負責判斷。
 
-Typical responsibilities:
+常見責任包括：
 
-- interpret the current goal
-- choose a workflow or skill
-- split work into assignments
-- decide when evidence is sufficient
-- escalate ambiguity or risk
+- 理解目前目標
+- 選擇 Workflow 或 Skill
+- 把工作拆成 Assignment
+- 判斷 Evidence 是否足夠
+- 遇到風險或不確定性時升級處理
 
-An agent should **not** duplicate detailed procedural rules already owned by a skill.
+Agent **不應重複 Skill 已經定義好的詳細程序規則**，否則規則會散落在多處，難以維護與審查。
 
 ### Skill
 
-A skill is a reusable execution contract.
+Skill 是可重用的執行契約（execution contract）。
 
-A useful skill definition includes:
+一個可審查的 Skill 至少應定義：
 
 ```yaml
 name: example-review
@@ -87,55 +87,62 @@ validation:
   - evidence_required
 ```
 
-The skill should define the repeatable procedure, expected artifacts, failure conditions, and tool boundary.
+Skill 應負責定義：
+
+- 可重複程序
+- 輸入與輸出
+- 預期 Artifact
+- Failure Condition
+- Tool Boundary
+- Validation Requirement
 
 ### Governance
 
-Governance determines whether an otherwise valid action is permitted.
+Governance 判斷「即使技術上做得到，這個操作是否被允許」。
 
-Examples:
+例如：
 
-- protected branches cannot be written directly
-- secrets cannot be copied into prompts or public artifacts
-- external skills must be evaluated before promotion
-- production deployment requires human approval
-- destructive actions require explicit authorization
-- validation evidence is required before completion
+- Protected Branch 不得直接寫入
+- Secret 不得複製到 Prompt 或 Public Artifact
+- 外部 Skill 必須經過評估才能晉升
+- Production Deployment 必須人工批准
+- Destructive Action 必須取得明確授權
+- 任務完成前必須有 Validation Evidence
 
-## Decision precedence
+## 規則優先序
 
-When rules conflict, use an explicit precedence model:
+當規則互相衝突時，應使用明確優先序：
 
 ```text
-Security / privacy boundary
+Security / Privacy Boundary
         ↓
-Governance policy
+Governance Policy
         ↓
-Task-specific constraints
+Task-specific Constraints
         ↓
-Skill contract
+Skill Contract
         ↓
-Agent discretion
+Agent Discretion
         ↓
-Model preference
+Model Preference
 ```
 
-Higher layers narrow lower layers. An agent cannot override a security boundary because it believes another path is more efficient.
+上層規則限制下層規則。Agent 不能因為認為某個方法「比較快」就覆寫 Security Boundary。
 
-## Least-context and least-privilege assignment
+## Least Context + Least Privilege Assignment
 
-Each subtask should receive:
+每一個 Subtask 應只取得：
 
-1. only the context needed to make the decision,
-2. only the tools needed to perform the procedure,
-3. only the write scope needed for the output,
-4. explicit completion criteria.
+1. 做判斷需要的上下文；
+2. 執行程序需要的工具；
+3. 產生輸出需要的最小 Write Scope；
+4. 明確完成條件。
 
-Example:
+例如：
 
 ```yaml
 assignment:
-  objective: "Review example component accessibility"
+  objective: "檢查範例元件的 Accessibility"
   context:
     - "component source"
     - "acceptance criteria"
@@ -145,25 +152,25 @@ assignment:
   writes:
     - "none"
   complete_when:
-    - "findings include evidence and severity"
+    - "findings 包含 evidence 與 severity"
 ```
 
-A later implementation assignment may receive write permission, but the reviewer does not need it.
+後續 Implementation Assignment 可以取得必要寫入權，但 Reviewer 本身通常不需要。
 
-## Promotion lifecycle
+## 能力晉升生命週期
 
-Capabilities should move through states instead of appearing directly in the stable agent environment.
+新的能力不應直接出現在 stable agent environment，而應經過明確狀態：
 
 ```mermaid
 flowchart LR
     I[Candidate] --> R[Research]
     R --> T[Test]
     T --> D{Decision}
-    D -->|reject| X[Rejected / archived]
-    D -->|adapt| A[Adapted pattern]
-    D -->|adopt| S[Stable skill]
-    A --> G[Governed production use]
+    D -->|reject| X[Rejected / Archived]
+    D -->|adapt| A[Adapted Pattern]
+    D -->|adopt| S[Stable Skill]
+    A --> G[Governed Production Use]
     S --> G
 ```
 
-This makes the system explainable: stable behavior exists because it passed an explicit evaluation and promotion decision.
+這讓系統具有可解釋性：Stable Behavior 之所以存在，是因為它通過了明確的評估、風險判斷與晉升決策。
