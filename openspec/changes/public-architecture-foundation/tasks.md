@@ -9,48 +9,52 @@
 - [x] 保護 symlinked `CLAUDE.md` / `AGENTS.md`
 - [x] 拒絕 symlinked `INSTALL-METADATA`
 - [x] 禁止未 uninstall 直接切換 Adapter
-- [x] 擴充 installer boundary tests
-- [x] 新增 `scripts/privacy-check.sh`
-- [x] 新增統一 `scripts/check.sh`
 - [x] 建立 Public Capability Catalog
 - [x] 將 Agent 分成 Lifecycle / Domain 兩個維度
-- [x] 公開 Design / Product / People Domain Coordinators
-- [x] 公開 Clarify / Adversarial Review / Roadmap Planning
-- [x] 公開 Design Brief / Review / Spec / System
-- [x] 公開 Code Review / Root Cause / Task Checkpoint / Skill Audit
-- [x] 公開 Meeting to Decisions
-- [x] Public Core 達到 7 Agents / 18 Skills
+- [x] 建立目前 Public Core Agent / Skill Contract
 - [x] 新增 Public Capability OpenSpec
-- [x] Installer regression test 驗證新增 Agent / Skill 會一起安裝
-- [x] 同步根 README 的 Public Capability 摘要與數量
-- [x] 執行 shell syntax check
-- [x] 執行 installer smoke / regression tests
-- [x] 執行 privacy check
-- [x] 執行 privacy negative case
-- [x] 執行 contract structure check（含 7 Agents / 18 Skills count）
-- [x] 最終比對 `main` 與 Draft PR 狀態
+- [x] 新增 `scripts/privacy-check.sh`
+- [x] 新增 `scripts/privacy-history-check.sh`
+- [x] 新增統一 `scripts/check.sh`
+- [x] Installer regression test 驗證 Public Agent / Skill 會一起安裝
+- [x] 同步 README / INSTALL / PRIVACY / Adapter 文件
+
+## Reverse Review Fixes
+
+- [x] MIT `LICENSE` 隨 Public Core 安裝，避免散布 notice 遺失
+- [x] Installer regression 驗證 `.ai-agent-architecture/LICENSE`
+- [x] 移除 `check.sh` 的固定 7 / 18 capability count gate
+- [x] Capability count 改為依實際檔案動態盤點
+- [x] Claude Code Adapter 移除手寫 capability inventory
+- [x] Codex Adapter 移除手寫 capability inventory
+- [x] Adapter 改由 `agents/README.md` / `skills/README.md` 發現能力
+- [x] Reviewer 區分 independent review / structured self-review
+- [x] Adversarial Review 不再把同 session multi-lens 誇大成 independent review
+- [x] People Coordinator 禁止 AI 自動員工／候選人排名與評分
+- [x] 文件明示 `.ai-agent-architecture/` 是可替換的 managed namespace
+- [x] Current-tree Privacy Check 擴充常見文字格式
+- [x] 新增 Git history Privacy Scan，避免只檢查最終 diff
+- [x] 根 README 簡化，減少與 canonical docs 重複
 
 ## Verification Notes
 
 - Branch：`feature/public-architecture-foundation`
-- 相對 `main`：`behind 0`
-- GitHub PR changed-file inventory：7 Agent Contract / 18 Skill Contract
-- Local equivalent fixture：`install tests passed`
-- Local equivalent fixture：`privacy checks passed`
-- Local equivalent fixture：`all checks passed (7 agents, 18 skills)`
-- Privacy negative case（unexpected real email pattern）：正確 fail
-- GitHub PR diff 搜尋未發現私人 AI brain repository 名稱、Personal Memory store 名稱或私人 Email
+- 相對 `main`：每輪收尾重新確認
+- Public capability inventory：由實際 `agents/*.md` / `skills/*/SKILL.md` 動態盤點
+- Current-tree privacy：`scripts/privacy-check.sh`
+- Git-history privacy：`scripts/privacy-history-check.sh`（需真實 Git worktree）
 - Public Capability Boundary：`docs/governance/public-capability-catalog.md`
 - Public Capability Spec：`specs/public-capabilities/spec.md`
 - GitHub Actions / Deploy / Secret：本次未修改
-- 正式 License：repository `main` 已存在 MIT License；本次只同步相關文件，不修改授權本文。
+- 正式 License：repository 已採用 MIT；Installer 現在同步散布 notice
 
 ### Environment limitation
 
-執行環境無法解析 `github.com` DNS，因此不能用 `git clone` 直接把 remote feature branch 拉進本機執行。為避免把環境問題誤報成測試結果，本次採兩段驗證：
+目前執行環境無法直接 `git clone` remote feature branch，因此：
 
-1. GitHub connector 核對實際 branch / PR 的檔案、diff、數量與敏感字串。
-2. 以目前 branch 的 Installer / Uninstaller / Privacy / Check 契約建立等價本機 fixture，執行完整回歸。
+1. GitHub connector 用來核對真實 branch / PR 檔案、diff 與狀態。
+2. Installer / Privacy / Contract scripts 使用等價 fixture 做本機回歸。
+3. `privacy-history-check.sh` 已加入，但真正的 remote branch history 掃描仍必須在可取得 `.git` metadata 的 clone 中執行；沒有 Git metadata 時腳本會明確顯示 skipped。
 
 ## Keep-private boundary
 
