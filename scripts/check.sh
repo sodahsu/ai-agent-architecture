@@ -6,12 +6,13 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 
 cd "$REPO_ROOT"
 
-bash -n scripts/install.sh scripts/uninstall.sh scripts/test-install.sh scripts/privacy-check.sh scripts/check.sh
+bash -n scripts/*.sh
 bash scripts/test-install.sh
 bash scripts/privacy-check.sh
 
 REQUIRED_FILES=(
   AGENTS.md
+  CONTRIBUTING.md
   README.md
   INSTALL.md
   PRIVACY.md
