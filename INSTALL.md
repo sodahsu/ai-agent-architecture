@@ -2,6 +2,8 @@
 
 這個專案可以安裝到其他人的 Repository，作為平台中立的 AI Agent / Skill / Governance 方法層。
 
+> 目前安裝器仍在 Draft PR 分支開發中；PR 合併到 `main` 後，公開使用者即可直接從預設分支 Clone 並安裝。
+
 ## 支援模式
 
 目前支援：
@@ -32,7 +34,7 @@ Codex       → AGENTS.md
 
 ## 快速安裝
 
-先 Clone：
+PR 合併後可直接：
 
 ```bash
 git clone https://github.com/sodahsu/ai-agent-architecture.git
