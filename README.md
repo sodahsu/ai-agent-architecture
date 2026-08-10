@@ -4,6 +4,14 @@ A privacy-safe reference architecture and methodology for designing multi-agent 
 
 This repository focuses on **how the system is designed** rather than exposing any person's actual AI memory, accounts, machines, repositories, credentials, or private operating context.
 
+## Start here
+
+- [Six-Repository Pattern](docs/architecture/six-repository-pattern.md) — separate knowledge, agent control, evaluation, execution, lab, and portfolio responsibilities.
+- [System Overview](docs/architecture/system-overview.md) — layers, boundaries, and design properties.
+- [Agent Workflow Methodology](docs/methodology/agent-workflow.md) — goal → routing → execution → validation → approval → handoff.
+- [Public / Private Boundary](docs/governance/public-private-boundary.md) — rules for safely distilling private work into public methodology.
+- [Privacy Policy](PRIVACY.md) — content that must never be committed.
+
 ## What this repository explains
 
 - How to separate private memory from public architecture
@@ -39,6 +47,7 @@ This repository focuses on **how the system is designed** rather than exposing a
 ```text
 docs/
 ├── architecture/
+│   ├── six-repository-pattern.md
 │   └── system-overview.md
 ├── methodology/
 │   └── agent-workflow.md
