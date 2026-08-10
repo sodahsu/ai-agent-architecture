@@ -30,8 +30,6 @@ Claude Code → CLAUDE.md
 Codex       → AGENTS.md
 ```
 
-如果目標 Repository 已經存在 `CLAUDE.md` 或 `AGENTS.md`，安裝器**不會覆蓋**，而是建立一份整合片段，讓使用者手動合併。
-
 ## 快速安裝
 
 PR 合併後可直接：
@@ -79,22 +77,26 @@ bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target 
 - Production configuration
 - 使用者本機私人設定
 
+`INSTALL-METADATA` 只記錄公開專案識別、schema version 與 adapter 類型；**不會寫入 installer 所在機器的絕對路徑**。
+
 ## 既有入口檔處理
 
-### 若入口不存在
+### 入口不存在
 
 安裝器會建立由本專案管理、帶有 marker 的入口：
 
 - Claude Code：`CLAUDE.md`
 - Codex：`AGENTS.md`
 
-之後重新安裝時，只會自動更新帶有本專案 marker 的入口。
+### 入口已存在或被修改
 
-### 若入口已存在
+安裝器採 fail-safe 行為：
 
-不覆蓋原檔。
+- 使用者原本就存在的入口 → 永不覆蓋
+- 本專案先前建立、但之後被使用者修改的入口 → 永不覆蓋
+- symlinked `CLAUDE.md` / `AGENTS.md` → 永不沿 symlink 寫入
 
-會產生：
+上述情況都會產生整合片段：
 
 ```text
 .ai-agent-architecture/CLAUDE.integration.md
@@ -108,14 +110,27 @@ bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target 
 
 使用者可自行把其中規則併入既有入口。
 
+### 未修改的 managed entry
+
+只有當現有 entry 與前一次安裝在 `.ai-agent-architecture/adapter/` 的版本完全相同時，重新安裝才會自動更新 entry。
+
+這避免「只因為還保留 managed marker，就把使用者後續修改覆蓋掉」。
+
 ## 更新
 
-重新執行安裝指令即可更新 `.ai-agent-architecture/` 內的公開核心。
+重新執行同一安裝指令即可更新 `.ai-agent-architecture/` 內的公開核心。
 
 入口檔處理規則保持不變：
 
-- 本專案管理的入口 → 可安全更新
-- 使用者原有入口 → 永不覆蓋
+- 未修改的 managed entry → 可自動更新
+- 已修改的 managed entry → 保留並產生 Integration Template
+- 使用者原有 entry → 永不覆蓋
+
+## Symlink 安全邊界
+
+若目標 repository 的 `.ai-agent-architecture` 本身是 symbolic link，安裝器會直接拒絕執行。
+
+理由：這個 namespace 由安裝器管理；若允許它指向 target repository 外部路徑，複製與清理行為可能越過原本授權的 write scope。
 
 ## 解除安裝
 
@@ -125,9 +140,11 @@ bash scripts/uninstall.sh --target /path/to/project
 
 解除安裝會：
 
-1. 移除 `.ai-agent-architecture/`
-2. 若 `CLAUDE.md` / `AGENTS.md` 明確帶有本專案 managed marker，才會移除
-3. 使用者原本存在的入口檔永遠保留
+1. 移除 `.ai-agent-architecture/` managed namespace。
+2. 只有當 `CLAUDE.md` / `AGENTS.md` 同時具備 managed marker，且內容與目前安裝的 adapter entry **完全相同**時，才移除入口檔。
+3. 任何已修改的 managed entry、使用者原有 entry 或 symlinked entry 都保留。
+
+若 `.ai-agent-architecture` 是 symbolic link 或非目錄物件，解除安裝會 fail closed，不沿該路徑操作。
 
 ## 自測
 
@@ -139,16 +156,27 @@ bash scripts/test-install.sh
 
 測試會使用暫存資料夾驗證：
 
-- Claude Code 新專案可正常安裝與解除安裝
+- Claude Code 新專案可正常安裝
+- 未修改 managed entry 可安全更新
+- 已修改 managed entry 不會被更新或解除安裝誤刪
 - Codex 既有 `AGENTS.md` 不會被覆蓋
 - Integration Template 能正確產生
-- 解除安裝不會誤刪使用者既有入口
+- `.ai-agent-architecture` symlink 會被拒絕
+- symlinked entry 不會被覆蓋
+- Metadata 不含來源機器絕對路徑
+- 缺少必要參數時會安全失敗
+
+維護者的完整本機檢查入口：
+
+```bash
+bash scripts/check.sh
+```
+
+它會執行 shell syntax、安裝回歸測試、Privacy Check 與 Agent / Skill Contract 結構檢查。
 
 ## 安全原則
 
-安裝器不讀取、不蒐集、不上傳目標 Repository 的內容。
-
-它只執行本機檔案複製與目錄建立，不會：
+安裝器不蒐集、不上傳目標 Repository 的內容，也不會：
 
 - 呼叫外部 API
 - 讀取 Secret
@@ -156,3 +184,5 @@ bash scripts/test-install.sh
 - Commit / Push
 - 安裝第三方套件
 - 執行 Production Deployment
+
+為判斷既有入口是否可安全自動更新，安裝器只會在目標 repository 內比較現有 `CLAUDE.md` / `AGENTS.md` 與前一次安裝的 adapter entry；不會把內容送出本機。
