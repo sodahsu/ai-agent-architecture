@@ -1,18 +1,18 @@
 # 公開 Skill 套件
 
-這個目錄提供平台中立、可公開重用的 Skill Contract。Skill 描述的是「穩定可重複的執行程序」，不綁定特定 AI 模型，也不包含私人環境設定。
+這個目錄是 Public Skill 的 canonical index。Skill 描述「穩定可重複的執行程序」，不綁定特定模型，也不依賴私人環境設定。
 
-目前共有 **18 個 Public Skills**。
+目前 snapshot 共有 **18 個 Public Skills**；實際能力以這個索引與 `skills/*/SKILL.md` 為準，不把數量寫死成 validation registry。
 
 ## Core / Governance
 
 | Skill | 用途 |
 |---|---|
-| [clarify](clarify/SKILL.md) | 在執行前檢查 Intent / Scope / Scale，避免過度詢問或錯誤擴張 |
+| [clarify](clarify/SKILL.md) | 在執行前檢查 Intent / Scope / Scale，避免錯誤擴張 |
 | [task-contract](task-contract/SKILL.md) | 把目標轉成 Scope、Constraints、Acceptance Criteria 與 Risk Gate |
 | [bounded-implementation](bounded-implementation/SKILL.md) | 在明確寫入範圍內做最小可逆變更 |
-| [evidence-review](evidence-review/SKILL.md) | 依 Acceptance Criteria 與 Evidence 做獨立審查 |
-| [adversarial-review](adversarial-review/SKILL.md) | 用獨立反方鏡頭檢查重大結論與架構判斷 |
+| [evidence-review](evidence-review/SKILL.md) | 依 Acceptance Criteria 與 Evidence 做可追溯 Review，明確標記 review mode |
+| [adversarial-review](adversarial-review/SKILL.md) | 用 Skeptic / Red Team / Simplifier 鏡頭檢查重大結論；有隔離 context 才稱 independent |
 | [privacy-sanitizer](privacy-sanitizer/SKILL.md) | 將私人經驗萃取成不可回推身份的公開內容 |
 | [handoff](handoff/SKILL.md) | 產出可交接、可追溯的工作狀態 |
 | [capability-evaluation](capability-evaluation/SKILL.md) | 評估新 Skill / Tool / MCP 是否應 Adopt、Adapt 或 Reject |
@@ -61,11 +61,12 @@ Completion Criteria
 ## 設計原則
 
 - Skill 擁有程序，Agent 擁有判斷。
-- Permission 必須是 Contract 的一部分，而不是執行時臨時擴張。
-- Validation 必須能產生 Evidence。
-- 失敗不代表可自動擴大 Scope。
-- 高風險行為必須交給 Governance / Human Approval Gate。
-- 公開 Skill 不得依賴私人 Memory、私人 Repository 名稱、個人帳號、本機固定路徑或 Production Credential 才能成立。
+- Permission 是 Contract 的一部分，不在執行中臨時擴張。
+- Validation 必須產生可追溯 Evidence。
+- 失敗不代表可以自動擴大 Scope。
+- 高風險行為進 Governance / Human Approval Gate。
+- Public Skill 不依賴 Personal Memory、Private Repository、個人帳號、本機固定路徑或 Production Credential。
 - Provider-specific 行為放 Adapter；核心 Skill 保持 Runtime-neutral。
+- `independent review` 是執行條件，不是只靠角色名稱就自動成立。
 
 哪些能力刻意不公開，見 [`docs/governance/public-capability-catalog.md`](../docs/governance/public-capability-catalog.md)。
