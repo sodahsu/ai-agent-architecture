@@ -6,6 +6,37 @@
 
 > **核心原則：公開方法，不公開私人 AI 大腦。**
 
+## 快速安裝
+
+目前支援 Claude Code 與 Codex。
+
+```bash
+git clone https://github.com/sodahsu/ai-agent-architecture.git
+cd ai-agent-architecture
+```
+
+Claude Code：
+
+```bash
+bash scripts/install.sh --adapter claude-code --target /path/to/project
+```
+
+Codex：
+
+```bash
+bash scripts/install.sh --adapter codex --target /path/to/project
+```
+
+安裝器會把公開核心放進目標專案的 `.ai-agent-architecture/`，並安全建立或整合 `CLAUDE.md` / `AGENTS.md`。若入口檔已存在，不會覆蓋使用者原有內容。
+
+完整說明見 [INSTALL.md](INSTALL.md)。
+
+自測：
+
+```bash
+bash scripts/test-install.sh
+```
+
 ## 先理解架構層級
 
 這個專案包含六倉、Agent、Skill、Governance、Workflow、Artifact 等概念，但它們**不是同一層級**。
@@ -54,10 +85,12 @@ Governance  = 以上所有行為哪些被允許
 5. [Agent / Skill / Governance 模型](docs/architecture/agent-skill-governance.md) — 分離判斷、可重複程序、工具權限與批准機制。
 6. [公開 Agent 套件](agents/README.md) — 可直接採用或改造的 Coordinator / Implementer / Reviewer / Evaluator 角色契約。
 7. [公開 Skill 套件](skills/README.md) — 可重用的 Task Contract、Bounded Implementation、Evidence Review、Privacy Sanitizer、Handoff 與 Capability Evaluation。
-8. [Agent 工作方法](docs/methodology/agent-workflow.md) — 目標 → 路由 → 執行 → 驗證 → 批准 → 交接。
-9. [匿名功能交付範例](examples/feature-delivery.md) — 使用完全虛構的情境走完一次完整流程。
-10. [公開／私有邊界](docs/governance/public-private-boundary.md) — 如何把私人實作經驗萃取成可公開的方法。
-11. [隱私規範](PRIVACY.md) — 明確列出不可提交到公開 repository 的內容。
+8. [Adapter Layer](adapters/README.md) — 把同一套核心 Contract 映射到 Claude Code 與 Codex。
+9. [安裝指南](INSTALL.md) — 安裝、更新、解除安裝與入口保護規則。
+10. [Agent 工作方法](docs/methodology/agent-workflow.md) — 目標 → 路由 → 執行 → 驗證 → 批准 → 交接。
+11. [匿名功能交付範例](examples/feature-delivery.md) — 使用完全虛構的情境走完一次完整流程。
+12. [公開／私有邊界](docs/governance/public-private-boundary.md) — 如何把私人實作經驗萃取成可公開的方法。
+13. [隱私規範](PRIVACY.md) — 明確列出不可提交到公開 repository 的內容。
 
 ## 可直接公開使用的 Agent / Skill
 
@@ -84,6 +117,26 @@ capability-evaluation   → 評估新 AI 能力的採用與晉升條件
 ```
 
 每個 Skill 都定義 `Purpose / Inputs / Outputs / Preconditions / Permissions / Procedure / Validation / Failure Conditions / Completion Criteria`，可直接轉成不同 Agent Runtime 的 Skill 格式。
+
+## Adapter Layer
+
+核心方法只維護一份：
+
+```text
+agents/ + skills/ + governance
+              │
+       ┌──────┴──────┐
+       ↓             ↓
+Claude Code        Codex
+CLAUDE.md          AGENTS.md
+```
+
+Adapter 只處理平台入口與載入方式，不複製完整 Skill Procedure，因此能避免 Claude / Codex 兩份規則逐漸漂移。
+
+目前：
+
+- `adapters/claude-code/`
+- `adapters/codex/`
 
 ## 這個 repository 要說明什麼
 
@@ -172,6 +225,20 @@ skills/
 ├── handoff/SKILL.md
 └── capability-evaluation/SKILL.md
 
+adapters/
+├── README.md
+├── claude-code/
+│   ├── README.md
+│   └── CLAUDE.md
+└── codex/
+    ├── README.md
+    └── AGENTS.md
+
+scripts/
+├── install.sh
+├── uninstall.sh
+└── test-install.sh
+
 docs/
 ├── architecture/
 │   ├── layer-model.md
@@ -192,6 +259,7 @@ examples/
 templates/
 └── workspace.example.yaml
 
+INSTALL.md
 PRIVACY.md
 README.md
 ```
@@ -246,6 +314,8 @@ Sanitized Learning
 - Workflow 與 Artifact Contract
 - 4 個公開 Agent 角色
 - 6 個公開 Skill Contract
+- Claude Code / Codex Adapter
+- 安裝、更新、解除安裝與自測腳本
 - 第一個匿名端到端範例
 
-目前公開內容仍以**方法與契約**為主，不包含真實 Production Runtime、私人系統設定或 Credential。
+目前公開內容不包含真實 Production Runtime、私人系統設定或 Credential。
