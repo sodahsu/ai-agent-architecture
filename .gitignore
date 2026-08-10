@@ -1,0 +1,33 @@
+# Credentials and environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Private/local runtime
+.private/
+private/
+local/
+.local/
+memory/
+.memoria/
+credentials/
+secrets/
+runtime/
+
+# Machine-specific files
+.DS_Store
+Thumbs.db
+*.log
+*.local
+*.local.*
+
+# Editor/runtime caches
+.vscode/
+.idea/
+node_modules/
+.tmp/
+tmp/
