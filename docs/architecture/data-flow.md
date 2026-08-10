@@ -1,12 +1,12 @@
-# Cross-Repository Data Flow
+# 跨倉資料流（Cross-Repository Data Flow）
 
-This document defines how information and work should move between architectural roles without turning every repository into a shared dumping ground.
+這份文件定義資訊與工作如何在不同架構角色之間移動，同時避免每一個 repository 最後都變成共享資料垃圾場。
 
-## Flow model
+## 資料流模型
 
 ```mermaid
 sequenceDiagram
-    participant U as User / Operator
+    participant U as 使用者 / 操作者
     participant K as Knowledge
     participant C as Agent Control
     participant E as Evaluation
@@ -14,81 +14,83 @@ sequenceDiagram
     participant L as Lab
     participant P as Portfolio
 
-    U->>C: Goal + constraints
-    C->>K: Request approved context
-    K-->>C: Minimal context contract
-    C->>E: Evaluate unknown capability when needed
-    E-->>C: Adopt / adapt / reject decision
-    C->>X: Bounded assignment
-    X-->>C: Result + validation evidence
-    C-->>U: Review or approval request
-    C->>L: Sanitized reusable insight
-    L->>P: Curated public evidence
+    U->>C: 目標 + 限制條件
+    C->>K: 請求任務所需上下文
+    K-->>C: 最小 Context Contract
+    C->>E: 必要時評估未知能力
+    E-->>C: Adopt / Adapt / Reject 決策
+    C->>X: 有邊界的 Assignment
+    X-->>C: 結果 + 驗證證據
+    C-->>U: Review 或 Approval Request
+    C->>L: 去識別化、可重用洞察
+    L->>P: 精選後的公開證據
 ```
 
-## Artifact contracts
+## Artifact Contract
 
-Repositories should exchange **small explicit artifacts** instead of silently depending on each other's internal structure.
+不同 repository 之間應交換**小而明確的 artifact**，而不是偷偷依賴彼此的內部目錄或完整資料結構。
 
-| Artifact | Producer | Consumer | Contains | Must not contain |
+| Artifact | 產生者 | 使用者 | 應包含 | 不應包含 |
 |---|---|---|---|---|
-| Context contract | Knowledge | Agent Control | task-relevant facts, constraints, current decisions | full memory dumps, unrelated personal context |
-| Capability decision | Evaluation | Agent Control | source, fit, risks, decision, installation boundary | unreviewed third-party secrets or private runtime state |
-| Assignment brief | Agent Control | Execution | objective, scope, allowed tools, completion criteria | unlimited credentials or ambiguous write permission |
-| Execution evidence | Execution | Agent Control | result, tests, diff summary, failures, rollback note | hidden mutation or undocumented side effects |
-| Public insight | Agent Control / Lab | Lab | generalized lesson, method, pattern | identifying project details |
-| Portfolio evidence | Lab | Portfolio | curated problem, decision, outcome, reflection | confidential implementation details |
+| Context Contract | Knowledge | Agent Control | 任務相關事實、限制、已確定決策 | 完整 memory dump、無關私人上下文 |
+| Capability Decision | Evaluation | Agent Control | 來源、適配度、風險、決策、安裝邊界 | 未審查第三方 Secret、私人 runtime state |
+| Assignment Brief | Agent Control | Execution | 目標、Scope、允許工具、完成條件 | 無限制 Credential、模糊寫入權限 |
+| Execution Evidence | Execution | Agent Control | 結果、測試、Diff 摘要、失敗、Rollback 說明 | 隱藏修改、未揭露副作用 |
+| Public Insight | Agent Control / Lab | Lab | 泛化經驗、方法、Pattern | 可識別真實專案細節 |
+| Portfolio Evidence | Lab | Portfolio | 精選問題、決策、成果、反思 | 機密實作細節 |
 
-## Write-direction rules
+## 寫入方向規則
 
-A useful default is to make cross-repository writes rarer than reads.
-
-```text
-Knowledge       -> Agent Control     : read through a context contract
-Evaluation      -> Agent Control     : promote only approved capability decisions
-Agent Control   -> Execution         : create bounded work assignments
-Execution       -> target repository : branch / draft / proposal by default
-Lab             -> Portfolio         : curated public narrative
-```
-
-Avoid designs where every agent can directly edit every repository. That collapses governance boundaries and makes provenance difficult to audit.
-
-## Minimal context principle
-
-When an agent needs context, send only what materially changes the task.
-
-Bad:
+一個安全的預設原則是：**跨 repository 的 write 應比 read 少。**
 
 ```text
-"Load the entire personal memory store and all project notes."
+Knowledge       -> Agent Control     : 透過 Context Contract 讀取必要上下文
+Evaluation      -> Agent Control     : 只晉升已核准的 Capability Decision
+Agent Control   -> Execution         : 建立有邊界的 Assignment
+Execution       -> Target Repository : 預設寫 branch / draft / proposal
+Lab             -> Portfolio         : 輸出精選公開敘事
 ```
 
-Better:
+避免讓每個 Agent 都可以直接編輯所有 repository。這會讓治理邊界失效，也會讓變更來源（provenance）難以追查。
+
+## 最小上下文原則（Minimal Context Principle）
+
+Agent 需要上下文時，只傳遞會實際影響任務判斷的資訊。
+
+不建議：
+
+```text
+「載入完整私人記憶與所有專案筆記。」
+```
+
+較好的做法：
 
 ```yaml
 context:
-  goal: "Improve the empty state of an example dashboard"
+  goal: "改善範例 Dashboard 的 Empty State"
   constraints:
-    - "Do not change authentication"
-    - "Keep existing component API"
+    - "不得修改 Authentication"
+    - "維持既有 Component API"
   decisions:
-    - "Use the current design system"
+    - "沿用目前 Design System"
   references:
     - "public/example-screen.md"
 ```
 
-## Failure and retry path
+## 失敗與重試路徑
 
 ```mermaid
 flowchart TD
     A[Assignment] --> B[Execution]
-    B --> C{Validation passes?}
-    C -->|yes| D[Return evidence]
-    C -->|no| E{Failure recoverable within scope?}
-    E -->|yes| F[Revise inside bounded scope]
+    B --> C{Validation 通過？}
+    C -->|是| D[回傳 Evidence]
+    C -->|否| E{能在既定 Scope 內恢復？}
+    E -->|是| F[在原 Scope 內修正]
     F --> B
-    E -->|no| G[Stop and return failure report]
-    G --> H[Human / control-layer decision]
+    E -->|否| G[停止並回傳 Failure Report]
+    G --> H[人工 / Control Layer 重新決策]
 ```
 
-Retries should not silently expand permissions, scope, cost, or mutation rights. A failed task is evidence for a new decision, not permission for unrestricted exploration.
+Retry 不應默默擴大 Permission、Scope、成本或 Mutation Rights。
+
+**任務失敗代表需要新的決策，不代表 Agent 自動取得無限制探索權。**
