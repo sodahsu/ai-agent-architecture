@@ -11,7 +11,7 @@ done < <(
   find "$REPO_ROOT" -type f \
     ! -path "$REPO_ROOT/.git/*" \
     ! -path "$REPO_ROOT/scripts/privacy-check.sh" \
-    \( -name '*.md' -o -name '*.yaml' -o -name '*.yml' -o -name '*.sh' \) \
+    \( -name '*.md' -o -name '*.yaml' -o -name '*.yml' -o -name '*.sh' -o -name '*.json' -o -name '*.toml' -o -name '*.txt' -o -name 'LICENSE' \) \
     -print0
 )
 
