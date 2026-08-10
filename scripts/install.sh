@@ -69,6 +69,7 @@ ENTRY_SOURCE="$REPO_ROOT/adapters/$ADAPTER/$ENTRY_NAME"
 ENTRY_TARGET="$TARGET_ABS/$ENTRY_NAME"
 INTEGRATION_TARGET="$DEST/${ENTRY_NAME%.md}.integration.md"
 PREVIOUS_ENTRY="$DEST/adapter/$ENTRY_NAME"
+METADATA="$DEST/INSTALL-METADATA"
 
 if [[ -L "$DEST" ]]; then
   echo "Refusing to install: .ai-agent-architecture is a symbolic link" >&2
@@ -77,6 +78,19 @@ fi
 if [[ -e "$DEST" && ! -d "$DEST" ]]; then
   echo "Refusing to install: .ai-agent-architecture exists and is not a directory" >&2
   exit 3
+fi
+if [[ -L "$METADATA" ]]; then
+  echo "Refusing to install: INSTALL-METADATA is a symbolic link" >&2
+  exit 3
+fi
+
+if [[ -f "$METADATA" ]]; then
+  EXISTING_ADAPTER="$(sed -n 's/^adapter=//p' "$METADATA" | head -n 1)"
+  if [[ -n "$EXISTING_ADAPTER" && "$EXISTING_ADAPTER" != "$ADAPTER" ]]; then
+    echo "Existing installation uses adapter: $EXISTING_ADAPTER" >&2
+    echo "Run scripts/uninstall.sh before switching to adapter: $ADAPTER" >&2
+    exit 4
+  fi
 fi
 
 ENTRY_IS_UNMODIFIED_MANAGED=false
@@ -88,7 +102,7 @@ fi
 
 mkdir -p "$DEST"
 rm -rf "$DEST/agents" "$DEST/skills" "$DEST/docs" "$DEST/adapter"
-rm -f "$DEST/PRIVACY.md" "$DEST/INSTALL-METADATA" "$INTEGRATION_TARGET"
+rm -f "$DEST/PRIVACY.md" "$METADATA" "$INTEGRATION_TARGET"
 
 cp -R "$REPO_ROOT/agents" "$DEST/agents"
 cp -R "$REPO_ROOT/skills" "$DEST/skills"
@@ -110,7 +124,7 @@ else
   echo "Integration template: ${INTEGRATION_TARGET#$TARGET_ABS/}"
 fi
 
-cat > "$DEST/INSTALL-METADATA" <<META
+cat > "$METADATA" <<META
 project=ai-agent-architecture
 schema_version=1
 adapter=$ADAPTER
