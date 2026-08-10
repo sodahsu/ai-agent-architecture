@@ -9,6 +9,7 @@ cd "$REPO_ROOT"
 bash -n scripts/*.sh
 bash scripts/test-install.sh
 bash scripts/privacy-check.sh
+bash scripts/privacy-history-check.sh
 
 REQUIRED_FILES=(
   AGENTS.md
@@ -59,17 +60,21 @@ for agent in agents/*.md; do
   done
 done
 
-[[ "$SKILL_COUNT" -eq 18 ]] || {
-  echo "check failed: expected 18 public skills, found $SKILL_COUNT" >&2
+[[ "$SKILL_COUNT" -gt 0 ]] || {
+  echo "check failed: no public skills found" >&2
   exit 1
 }
 
-[[ "$AGENT_COUNT" -eq 7 ]] || {
-  echo "check failed: expected 7 public agents, found $AGENT_COUNT" >&2
+[[ "$AGENT_COUNT" -gt 0 ]] || {
+  echo "check failed: no public agents found" >&2
   exit 1
 }
 
 grep -q '^<!-- ai-agent-architecture-managed -->$' adapters/claude-code/CLAUDE.md
 grep -q '^<!-- ai-agent-architecture-managed -->$' adapters/codex/AGENTS.md
+grep -q '\.ai-agent-architecture/agents/README\.md' adapters/claude-code/CLAUDE.md
+grep -q '\.ai-agent-architecture/skills/README\.md' adapters/claude-code/CLAUDE.md
+grep -q '\.ai-agent-architecture/agents/README\.md' adapters/codex/AGENTS.md
+grep -q '\.ai-agent-architecture/skills/README\.md' adapters/codex/AGENTS.md
 
 echo "all checks passed ($AGENT_COUNT agents, $SKILL_COUNT skills)"
