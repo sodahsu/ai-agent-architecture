@@ -30,6 +30,8 @@ Claude Code → CLAUDE.md
 Codex       → AGENTS.md
 ```
 
+同一個 `.ai-agent-architecture/` installation **一次只管理一個 Adapter**。若要從 Claude Code 切換到 Codex，或反向切換，必須先執行 uninstall，再安裝另一個 Adapter；安裝器不會在同一 namespace 隱性保留雙入口。
+
 ## 快速安裝
 
 PR 合併後可直接：
@@ -118,7 +120,7 @@ bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target 
 
 ## 更新
 
-重新執行同一安裝指令即可更新 `.ai-agent-architecture/` 內的公開核心。
+重新執行**相同 Adapter** 的安裝指令即可更新 `.ai-agent-architecture/` 內的公開核心。
 
 入口檔處理規則保持不變：
 
@@ -126,11 +128,24 @@ bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target 
 - 已修改的 managed entry → 保留並產生 Integration Template
 - 使用者原有 entry → 永不覆蓋
 
+若現有 `INSTALL-METADATA` 顯示另一個 Adapter，installer 會拒絕切換。請先：
+
+```bash
+bash scripts/uninstall.sh --target /path/to/project
+```
+
+再安裝新的 Adapter。
+
 ## Symlink 安全邊界
 
-若目標 repository 的 `.ai-agent-architecture` 本身是 symbolic link，安裝器會直接拒絕執行。
+下列 managed path 若是 symbolic link，安裝器會 fail closed：
 
-理由：這個 namespace 由安裝器管理；若允許它指向 target repository 外部路徑，複製與清理行為可能越過原本授權的 write scope。
+- `.ai-agent-architecture`
+- `.ai-agent-architecture/INSTALL-METADATA`
+
+另外，若 `CLAUDE.md` / `AGENTS.md` 本身是 symlink，安裝器會保留它，不沿 symlink 寫入，並改產生 Integration Template。
+
+理由：managed namespace 不應透過 symlink 把寫入範圍延伸到 target repository 外部。
 
 ## 解除安裝
 
@@ -163,6 +178,8 @@ bash scripts/test-install.sh
 - Integration Template 能正確產生
 - `.ai-agent-architecture` symlink 會被拒絕
 - symlinked entry 不會被覆蓋
+- symlinked metadata 不會被讀取或改寫
+- Adapter 不可在未 uninstall 前直接切換
 - Metadata 不含來源機器絕對路徑
 - 缺少必要參數時會安全失敗
 
