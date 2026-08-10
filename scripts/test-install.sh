@@ -16,7 +16,9 @@ CLAUDE_TARGET="$TMP/claude-project"
 CODEX_TARGET="$TMP/codex-project"
 SYMLINK_TARGET="$TMP/symlink-project"
 ENTRY_LINK_TARGET="$TMP/entry-link-project"
-mkdir -p "$CLAUDE_TARGET" "$CODEX_TARGET" "$SYMLINK_TARGET" "$ENTRY_LINK_TARGET"
+SWITCH_TARGET="$TMP/switch-project"
+METADATA_LINK_TARGET="$TMP/metadata-link-project"
+mkdir -p "$CLAUDE_TARGET" "$CODEX_TARGET" "$SYMLINK_TARGET" "$ENTRY_LINK_TARGET" "$SWITCH_TARGET" "$METADATA_LINK_TARGET"
 
 # Fresh Claude install creates a managed entry and privacy-safe metadata.
 bash "$INSTALL" --adapter claude-code --target "$CLAUDE_TARGET" >/dev/null
@@ -75,6 +77,30 @@ grep -q '^# external instructions$' "$ENTRY_EXTERNAL"
 bash "$UNINSTALL" --target "$ENTRY_LINK_TARGET" >/dev/null
 [[ -L "$ENTRY_LINK_TARGET/AGENTS.md" ]]
 grep -q '^# external instructions$' "$ENTRY_EXTERNAL"
+
+# Switching adapter without uninstall must fail and preserve the original install.
+bash "$INSTALL" --adapter claude-code --target "$SWITCH_TARGET" >/dev/null
+if bash "$INSTALL" --adapter codex --target "$SWITCH_TARGET" >/dev/null 2>&1; then
+  fail "installer allowed adapter switch without uninstall"
+fi
+[[ -f "$SWITCH_TARGET/CLAUDE.md" ]]
+[[ ! -e "$SWITCH_TARGET/AGENTS.md" ]]
+grep -q '^adapter=claude-code$' "$SWITCH_TARGET/.ai-agent-architecture/INSTALL-METADATA"
+bash "$UNINSTALL" --target "$SWITCH_TARGET" >/dev/null
+
+# Refuse symlinked metadata before reading or replacing it.
+bash "$INSTALL" --adapter codex --target "$METADATA_LINK_TARGET" >/dev/null
+rm -f "$METADATA_LINK_TARGET/.ai-agent-architecture/INSTALL-METADATA"
+METADATA_EXTERNAL="$TMP/external-metadata"
+printf '%s\n' 'adapter=codex' > "$METADATA_EXTERNAL"
+ln -s "$METADATA_EXTERNAL" "$METADATA_LINK_TARGET/.ai-agent-architecture/INSTALL-METADATA"
+if bash "$INSTALL" --adapter codex --target "$METADATA_LINK_TARGET" >/dev/null 2>&1; then
+  fail "installer accepted symlinked metadata"
+fi
+grep -q '^adapter=codex$' "$METADATA_EXTERNAL"
+rm -f "$METADATA_LINK_TARGET/.ai-agent-architecture/INSTALL-METADATA"
+printf '%s\n' 'project=ai-agent-architecture' 'schema_version=1' 'adapter=codex' > "$METADATA_LINK_TARGET/.ai-agent-architecture/INSTALL-METADATA"
+bash "$UNINSTALL" --target "$METADATA_LINK_TARGET" >/dev/null
 
 # Missing option values must fail cleanly.
 if bash "$INSTALL" --adapter >/dev/null 2>&1; then
