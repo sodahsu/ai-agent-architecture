@@ -1,31 +1,31 @@
-# Synthetic Example: Feature Delivery
+# 匿名範例：功能交付（Feature Delivery）
 
-This example is intentionally fictional. It demonstrates the architecture without using any real person, employer, client, repository, account, or production system.
+這是一個完全虛構的範例，用來示範架構如何運作。內容不對應任何真實人物、雇主、客戶、repository、帳號或 production system。
 
-## Scenario
+## 情境
 
-An example product team wants to improve the empty state of a dashboard.
+一個虛構產品團隊想改善 Dashboard 的 Empty State，讓第一次使用產品的人更清楚下一步該做什麼。
 
-Constraints:
+限制條件：
 
-- no authentication changes
-- no production deployment
-- existing component API must remain compatible
-- changes must be reviewable before merge
-- the reviewer must not receive write permission
+- 不修改 Authentication
+- 不進行 Production Deployment
+- 既有 Component API 必須維持相容
+- 變更在 merge 前必須可被 review
+- Reviewer 不應取得 Write Permission
 
-## Step 1 — Intent
+## Step 1 — Intent｜定義意圖
 
-The operator provides a goal rather than a long implementation prompt:
+操作者先提供目標，而不是直接寫一大段實作 Prompt：
 
 ```text
-Improve the example dashboard empty state so first-time users understand what to do next.
+改善範例 Dashboard 的 Empty State，讓第一次使用的人知道下一步該做什麼。
 ```
 
-The control layer turns this into an explicit assignment contract.
+Control Layer 把這個目標轉成明確 Assignment Contract：
 
 ```yaml
-objective: "Improve the dashboard empty state"
+objective: "改善 Dashboard Empty State"
 scope:
   include:
     - "empty-state component"
@@ -35,42 +35,42 @@ scope:
     - "billing"
     - "deployment"
 acceptance_criteria:
-  - "primary next action is visible"
-  - "keyboard interaction still works"
-  - "existing public component API is unchanged"
+  - "主要下一步行動清楚可見"
+  - "Keyboard Interaction 維持正常"
+  - "既有 Public Component API 不變"
 mutation_policy:
   - "feature branch only"
   - "no direct main write"
 ```
 
-## Step 2 — Context retrieval
+## Step 2 — Context Retrieval｜取得必要上下文
 
-The Knowledge role returns only approved task context.
+Knowledge Role 只回傳被允許、且與任務直接相關的資訊：
 
 ```yaml
 context_contract:
-  product_rule: "New users should see one primary next action"
-  design_rule: "Use existing system components before adding new variants"
-  technical_rule: "Keep the public component API stable"
+  product_rule: "新使用者應只看到一個主要下一步行動"
+  design_rule: "新增 Variant 前先使用既有 Design System Component"
+  technical_rule: "Public Component API 必須保持穩定"
 ```
 
-It does **not** export unrelated notes, personal history, credentials, or full memory.
+它**不會**輸出無關筆記、個人歷史、Credential 或完整 Memory。
 
-## Step 3 — Routing
+## Step 3 — Routing｜拆分與路由
 
-The coordinator selects three assignments:
+Coordinator 建立三個 Assignment：
 
 ```text
-A. Inspect current implementation        read-only
-B. Implement bounded change              branch write
-C. Review acceptance criteria            read-only
+A. 檢查目前實作          read-only
+B. 執行有限範圍修改      branch write
+C. 驗證 acceptance criteria  read-only
 ```
 
-Each assignment gets different permissions.
+三個角色取得不同 Permission，而不是所有 Agent 都拿到同一組權限。
 
-## Step 4 — Execution
+## Step 4 — Execution｜執行
 
-The implementation agent invokes stable skills rather than inventing a process from scratch.
+Implementation Agent 優先使用已穩定的 Skill，而不是每次重新發明流程：
 
 ```text
 inspect-component
@@ -84,11 +84,11 @@ run-tests
 prepare-handoff
 ```
 
-If a required capability is unknown, it is first sent to the Evaluation role. An unreviewed external tool is not silently installed into the stable environment.
+如果中途需要一個尚未驗證的外部能力，應先送進 Evaluation Role。未審查的外部工具不應直接安裝進 Stable Environment。
 
-## Step 5 — Validation
+## Step 5 — Validation｜驗證
 
-The executor returns evidence:
+Executor 回傳結果與 Evidence：
 
 ```yaml
 result:
@@ -105,11 +105,11 @@ result:
     main_modified: false
 ```
 
-The reviewer independently compares the result with the original acceptance criteria.
+Reviewer 再獨立拿原始 Acceptance Criteria 對照結果，不直接相信 Executor 自己宣告的完成狀態。
 
-## Step 6 — Approval gate
+## Step 6 — Approval Gate｜人工批准
 
-Because merge is a higher-risk mutation than editing a feature branch, the workflow stops at a reviewable artifact.
+Merge 的影響高於在 Feature Branch 上修改，因此流程停在可 Review 的 Artifact：
 
 ```text
 implementation
@@ -123,24 +123,29 @@ HUMAN APPROVAL
 merge decision
 ```
 
-The executor's ability to create a valid change does not imply authority to merge or deploy it.
+Executor 有能力做出正確修改，不代表它自動有權 Merge 或 Deploy。
 
-## Step 7 — Public distillation
+## Step 7 — Public Distillation｜公開萃取
 
-The private implementation is not copied into the public architecture repository.
+私人實作內容不直接複製進公開架構 repository。
 
-Instead, a reusable lesson may be distilled as:
+真正可以公開的是萃取後的方法，例如：
 
-> Separate inspection, implementation, and review assignments so each agent receives only the context and permissions required by its role.
+> 把 Inspect、Implement、Review 拆成不同 Assignment，讓每個 Agent 只取得自己角色需要的上下文與權限。
 
-That lesson can become documentation, a template, or a synthetic example like this one.
+這個 Lesson 可以再轉成：
 
-## What this example demonstrates
+- Documentation
+- Template
+- Pattern
+- Synthetic Example
 
-- intent is converted into explicit scope and acceptance criteria
-- private context is reduced to a minimal context contract
-- different agents receive different permissions
-- stable skills own repeatable procedures
-- governance limits mutation even when execution succeeds
-- validation evidence travels with the result
-- public documentation contains the method, not the original private work
+## 這個範例證明什麼
+
+- Intent 會被轉成明確 Scope 與 Acceptance Criteria
+- 私人上下文被壓縮成最小 Context Contract
+- 不同 Agent 取得不同 Permission
+- Stable Skill 負責可重複程序
+- 即使 Execution 成功，Governance 仍限制 Mutation
+- Validation Evidence 必須跟著結果一起回傳
+- 公開文件保存的是方法，而不是原始私人工作內容
