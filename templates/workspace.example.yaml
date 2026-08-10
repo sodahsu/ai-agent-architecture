@@ -1,0 +1,29 @@
+workspace:
+  name: example-workspace
+  visibility: public-example
+
+privacy:
+  private_memory: <private-memory-store>
+  commit_personal_context: false
+  commit_machine_paths: false
+  commit_credentials: false
+
+layers:
+  interaction:
+    role: receive-goals
+  routing:
+    role: select-bounded-capability
+  skills:
+    role: execute-reusable-procedures
+  review:
+    role: validate-and-gate-risk
+  runtime:
+    role: private-external-systems
+
+approval_gates:
+  - publish
+  - deploy
+  - destructive-change
+  - credentials
+  - migration
+  - protected-branch-write
