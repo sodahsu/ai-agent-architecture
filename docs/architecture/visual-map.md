@@ -1,54 +1,54 @@
-# Architecture Visual Map
+# 架構視覺圖（Architecture Visual Map）
 
-This document visualizes the reference architecture without exposing any real account, repository, workspace, machine, or private memory.
+這份文件只呈現可公開的參考架構，不包含任何真實帳號、repository、workspace、裝置或私人記憶。
 
-## Six-repository pattern
+## 六倉架構
 
 ```mermaid
 flowchart TB
-    subgraph PRIVATE[Private operating layer]
-        K[1. Knowledge Repository\nCanonical private context]
-        C[2. Agent Control Repository\nRules, routing, stable skills]
-        X[4. Execution Repository\nAsync jobs and automation]
+    subgraph PRIVATE[私有運作層]
+        K[1. Knowledge Repository\n私人知識真相源]
+        C[2. Agent Control Repository\n規則、路由、穩定 Skills]
+        X[4. Execution Repository\n非同步任務與自動化]
     end
 
-    subgraph REVIEW[Controlled promotion boundary]
-        E[3. Evaluation Repository\nTest external tools and skills]
-        G{{Governance gates\nprivacy · permissions · validation}}
+    subgraph REVIEW[受控晉升邊界]
+        E[3. Evaluation Repository\n測試外部工具與 Skills]
+        G{{Governance Gates\n隱私 · 權限 · 驗證}}
     end
 
-    subgraph PUBLIC[Public evidence layer]
-        L[5. Lab Repository\nExperiments and technical writing]
-        P[6. Portfolio Repository\nCurated outcomes and case studies]
+    subgraph PUBLIC[公開證據層]
+        L[5. Lab Repository\n實驗與技術文章]
+        P[6. Portfolio Repository\n精選成果與案例]
     end
 
-    K -->|approved context contract| C
+    K -->|核准後的 Context Contract| C
     E -->|adopt / adapt| G
-    G -->|stable capability| C
-    C -->|bounded assignment| X
-    X -->|result + evidence| C
-    C -->|sanitized insight| L
-    L -->|validated narrative| P
-    P -. feedback .-> C
+    G -->|穩定能力| C
+    C -->|有邊界的 Assignment| X
+    X -->|結果 + 驗證證據| C
+    C -->|去識別化洞察| L
+    L -->|驗證後敘事| P
+    P -. 回饋 .-> C
 ```
 
-The six repositories are **roles**, not mandatory product names. A team may implement them as six repositories, fewer repositories with strict directories, or more repositories when security boundaries require it.
+六個 repository 是**架構角色**，不是強制的產品名稱。實際系統可以真的拆成六個 repository，也可以在安全邊界一致時合併；若風險與部署需求更複雜，也可能拆得更多。
 
-## Public / private boundary
+## 公開／私有邊界
 
 ```mermaid
 flowchart LR
-    A[Private source material] --> B{Sanitization gate}
-    B -->|contains identity, secrets, private context| R[Reject or keep private]
-    B -->|reusable and non-identifying| M[Method / pattern / contract]
-    M --> D[Public documentation]
-    M --> T[Public template]
-    M --> E[Public synthetic example]
+    A[私人原始素材] --> B{去識別化 Gate}
+    B -->|含身份、Secret、私人上下文| R[拒絕公開或維持 Private]
+    B -->|可重用且不可識別| M[Method / Pattern / Contract]
+    M --> D[公開文件]
+    M --> T[公開模板]
+    M --> E[公開虛構範例]
 ```
 
-The public project should publish **reusable decisions and system design**, not snapshots of the operator's actual brain.
+公開專案應該發布的是**可重用的決策與系統設計**，不是操作者真實 AI 大腦的快照。
 
-## Control loop
+## 控制迴路
 
 ```mermaid
 flowchart LR
@@ -56,23 +56,21 @@ flowchart LR
     R --> A[Assign]
     A --> E[Execute]
     E --> V[Validate]
-    V --> H{Human approval required?}
-    H -->|yes| P[Approval gate]
-    H -->|no| O[Output]
-    P -->|approved| O
-    P -->|revise| R
-    O --> F[Feedback / learning]
+    V --> H{需要人工批准？}
+    H -->|是| P[Approval Gate]
+    H -->|否| O[Output]
+    P -->|批准| O
+    P -->|要求修正| R
+    O --> F[Feedback / Learning]
     F --> R
 ```
 
-This loop separates **decision-making**, **execution**, and **approval** so that an agent is not implicitly authorized to do everything simply because it can perform the task.
+這個迴路刻意把**判斷、執行與批准**分開。Agent 能做到某件事，不代表它自然擁有執行該操作的權限。
 
-## Design properties
+## 健康架構應具備的特性
 
-A healthy implementation should make these properties visible:
-
-1. **Canonical truth is explicit.** Memory and policy each have a defined source of truth.
-2. **Permissions are narrow.** Agents receive only the tools and write scope needed for the assignment.
-3. **Promotion is deliberate.** Experimental skills do not become stable behavior automatically.
-4. **Execution is reversible by default.** Changes prefer branches, drafts, proposals, or previews over direct irreversible writes.
-5. **Public artifacts are sanitized.** Examples are synthetic and cannot be used to reconstruct private operating context.
+1. **Canonical Truth 明確。** 記憶與政策都有清楚的真相源。
+2. **Permissions 狹窄。** Agent 只取得任務真正需要的工具與寫入範圍。
+3. **能力晉升有程序。** 實驗中的 Skill 不會自動變成 stable behavior。
+4. **預設可回復。** 優先使用 branch、draft、proposal、preview，而不是不可逆直接寫入。
+5. **公開 Artifact 已去識別化。** 範例使用 synthetic data，無法反推出私人運作上下文。
