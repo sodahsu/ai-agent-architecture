@@ -15,14 +15,16 @@ Claude Code Adapter 只負責：
 
 ## 建議讀取順序
 
+安裝後：
+
 ```text
 CLAUDE.md
   ↓
-README.md / docs/architecture/layer-model.md
+.ai-agent-architecture/docs/architecture/layer-model.md
   ↓
-agents/<role>.md
+.ai-agent-architecture/agents/<role>.md
   ↓
-skills/<name>/SKILL.md
+.ai-agent-architecture/skills/<name>/SKILL.md
   ↓
 Governance / Privacy Rules
 ```
@@ -60,9 +62,17 @@ Claude Code 可以使用 native agent / subagent 能力實作這些角色，但�
 
 ## 安裝方式
 
-最簡單的使用方式是把 `CLAUDE.md` 範本放到目標專案根目錄，並讓專案可以讀取本架構的 `agents/`、`skills/` 與 `docs/governance/`。
+```bash
+bash scripts/install.sh --adapter claude-code --target /path/to/project
+```
 
-可以使用 copy、submodule、subtree 或其他版本固定方式；重點是不要在多個地方手動維護同一份 Skill Procedure。
+安裝器會：
+
+1. 把公開核心放進 `.ai-agent-architecture/`
+2. 若專案沒有 `CLAUDE.md`，建立受管理入口
+3. 若已有 `CLAUDE.md`，保留原檔並產生 `.ai-agent-architecture/CLAUDE.integration.md`
+
+不會自動 Commit、Push 或修改 Git remote。
 
 ## 隱私
 
