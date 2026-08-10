@@ -1,32 +1,32 @@
-# Privacy Policy for Public Content
+# 公開內容隱私規範
 
-This repository is public. Every committed file must be safe to expose permanently.
+這是一個公開 repository。任何提交進來的檔案，都必須假設會被永久公開、被搜尋、被 fork，也可能被第三方索引或保存。
 
-## Allowed
+## 可以公開
 
-- generalized architecture patterns
-- reusable methodology
-- anonymized workflow diagrams
-- generic examples and templates
-- synthetic sample data
-- public documentation links
+- 泛化後的架構模式
+- 可重複使用的方法論
+- 去識別化的工作流程圖
+- 通用範例與模板
+- 完全虛構的 sample data
+- 已公開的官方文件連結
 
-## Forbidden
+## 禁止公開
 
-Do not commit any of the following:
+不得提交下列內容：
 
-- personal memory, notes, journals, conversation history, or private prompts
-- real names, personal email addresses, phone numbers, addresses, account IDs, or usernames
-- employer, client, internal project, or confidential business information
-- private repository names, private issue or PR links, internal domains, or non-public URLs
-- API keys, OAuth tokens, PATs, cookies, credentials, secrets, webhook secrets, or environment values
-- local absolute paths, device names, hostnames, IP addresses, SSH configuration, or machine-specific identifiers
-- production deployment configuration that exposes infrastructure details
-- raw logs or screenshots that may contain any of the above
+- 個人記憶、私人筆記、日誌、對話歷史或私人 prompt
+- 真實姓名、個人 Email、電話、地址、Account ID 或 Username
+- 雇主、客戶、內部專案或其他機密商業資訊
+- 私有 repository 名稱、private issue / PR 連結、內部 domain 或非公開 URL
+- API Key、OAuth Token、PAT、Cookie、Credential、Secret、Webhook Secret 或真實環境變數值
+- 本機絕對路徑、裝置名稱、Hostname、IP、SSH 設定或其他 machine-specific identifier
+- 會暴露基礎設施細節的 production deployment 設定
+- 可能包含上述資訊的原始 log、截圖或匯出資料
 
-## Example policy
+## 範例撰寫規則
 
-Prefer placeholders:
+優先使用 placeholder：
 
 ```text
 <workspace>
@@ -36,19 +36,19 @@ Prefer placeholders:
 user@example.com
 ```
 
-Do not replace them with real local values in committed files.
+不得在 commit 前把這些 placeholder 替換成真實本機值或實際帳號資訊。
 
-## Pre-commit review
+## 提交前檢查
 
-Before publishing a change, verify:
+每次準備公開變更前，至少確認：
 
-1. Can this content identify a real person, employer, client, account, machine, or private project?
-2. Does it reveal where private data is stored or how to access it?
-3. Does it contain a real credential, secret name paired with an operational value, or production endpoint?
-4. Can the example be rewritten with synthetic placeholders without losing the lesson?
+1. 內容能否識別真實人物、雇主、客戶、帳號、裝置或私人專案？
+2. 內容是否洩漏私人資料實際儲存位置，或提供可存取它的操作線索？
+3. 是否包含真實 credential、secret value 或 production endpoint？
+4. 是否可以改用完全虛構的名稱與 placeholder，而不影響要傳達的方法？
 
-If any answer creates unnecessary exposure, generalize or remove the content before merging.
+只要其中任何一項造成不必要暴露，就應在 merge 前泛化、去識別化或移除。
 
-## Design rule
+## 設計原則
 
-**Publish reusable knowledge. Keep operational identity and private context outside the public repository.**
+**公開可重用的知識；把真實身份、私人上下文與 production 運作資訊留在公開 repository 之外。**
