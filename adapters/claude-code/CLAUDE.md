@@ -1,3 +1,4 @@
+<!-- ai-agent-architecture-managed -->
 # Claude Code Adapter Entrypoint
 
 本檔是公開、安全、平台轉接用途的範本。
@@ -6,33 +7,33 @@
 
 先讀：
 
-1. `docs/architecture/layer-model.md`
-2. `docs/architecture/agent-skill-governance.md`
-3. `docs/governance/public-private-boundary.md`
+1. `.ai-agent-architecture/docs/architecture/layer-model.md`
+2. `.ai-agent-architecture/docs/architecture/agent-skill-governance.md`
+3. `.ai-agent-architecture/docs/governance/public-private-boundary.md`
 
 ## Agent Routing
 
 依任務責任選擇角色：
 
-- 規劃、拆解、Routing、Approval Gate → `agents/coordinator.md`
-- 有明確 Scope 的實作 → `agents/implementer.md`
-- Acceptance Criteria / Evidence 獨立審查 → `agents/reviewer.md`
-- 外部 Skill / Tool / MCP 導入判斷 → `agents/evaluator.md`
+- 規劃、拆解、Routing、Approval Gate → `.ai-agent-architecture/agents/coordinator.md`
+- 有明確 Scope 的實作 → `.ai-agent-architecture/agents/implementer.md`
+- Acceptance Criteria / Evidence 獨立審查 → `.ai-agent-architecture/agents/reviewer.md`
+- 外部 Skill / Tool / MCP 導入判斷 → `.ai-agent-architecture/agents/evaluator.md`
 
 角色契約是責任與權限定義，不代表一定要 spawn 子代理人。平台支援時可以使用 subagent；不支援時可在同一 session 依角色順序執行。
 
 ## Skill Routing
 
-非簡單任務先從 `skills/README.md` 找最小匹配 Skill，完整讀取對應 `SKILL.md` 後再執行。
+非簡單任務先從 `.ai-agent-architecture/skills/README.md` 找最小匹配 Skill，完整讀取對應 `SKILL.md` 後再執行。
 
 目前公開 Skills：
 
-- `skills/task-contract/SKILL.md`
-- `skills/bounded-implementation/SKILL.md`
-- `skills/evidence-review/SKILL.md`
-- `skills/privacy-sanitizer/SKILL.md`
-- `skills/handoff/SKILL.md`
-- `skills/capability-evaluation/SKILL.md`
+- `.ai-agent-architecture/skills/task-contract/SKILL.md`
+- `.ai-agent-architecture/skills/bounded-implementation/SKILL.md`
+- `.ai-agent-architecture/skills/evidence-review/SKILL.md`
+- `.ai-agent-architecture/skills/privacy-sanitizer/SKILL.md`
+- `.ai-agent-architecture/skills/handoff/SKILL.md`
+- `.ai-agent-architecture/skills/capability-evaluation/SKILL.md`
 
 Skill Contract 的 Preconditions、Permissions、Procedure、Validation、Failure Conditions 與 Completion Criteria 為執行邊界。
 
