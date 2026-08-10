@@ -61,8 +61,8 @@ context_contract:
 Coordinator 建立三個 Assignment：
 
 ```text
-A. 檢查目前實作          read-only
-B. 執行有限範圍修改      branch write
+A. 檢查目前實作              read-only
+B. 執行有限範圍修改          branch write
 C. 驗證 acceptance criteria  read-only
 ```
 
@@ -105,7 +105,9 @@ result:
     main_modified: false
 ```
 
-Reviewer 再獨立拿原始 Acceptance Criteria 對照結果，不直接相信 Executor 自己宣告的完成狀態。
+Reviewer 取得原始 Acceptance Criteria 與 Evidence，不直接相信 Executor 自己宣告的完成狀態。
+
+如果 Reviewer 使用與實作推理隔離的 reviewer / context，可標記為 `independent review`；如果只在同一 session 切換成 Reviewer 視角，則標記為 `structured-self-review`。兩者都可以提供價值，但驗證強度不能混為一談。
 
 ## Step 6 — Approval Gate｜人工批准
 
@@ -148,4 +150,5 @@ Executor 有能力做出正確修改，不代表它自動有權 Merge 或 Deploy
 - Stable Skill 負責可重複程序
 - 即使 Execution 成功，Governance 仍限制 Mutation
 - Validation Evidence 必須跟著結果一起回傳
+- Reviewer independence 取決於實際 Context Isolation，不由角色名稱保證
 - 公開文件保存的是方法，而不是原始私人工作內容
