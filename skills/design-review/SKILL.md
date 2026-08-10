@@ -51,7 +51,7 @@
 
 - 沒有原始 Goal，導致只能做純主觀美感評論
 - Evidence 不足以確認高風險 Finding
-- Reviewer 被要求直接修改被審 Target，破壞獨立審查角色
+- Reviewer 被要求直接修改被審 Target，破壞 Read-only Review Boundary
 
 ## Completion Criteria
 
