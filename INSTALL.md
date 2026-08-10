@@ -1,104 +1,69 @@
 # 安裝指南
 
-這個專案可以安裝到其他人的 Repository，作為平台中立的 AI Agent / Skill / Governance 方法層。
+這個專案可安裝到其他 Repository，作為平台中立的 Agent / Skill / Governance 方法層。
 
-> 目前安裝器仍在 Draft PR 分支開發中；PR 合併到 `main` 後，公開使用者即可直接從預設分支 Clone 並安裝。
+> 目前安裝器仍在 Draft PR 分支開發中；合併到 `main` 後才是正式的預設分支安裝入口。
 
-## 支援模式
+## 支援 Adapter
 
-目前支援：
+- Claude Code → `CLAUDE.md`
+- Codex → `AGENTS.md`
 
-- Claude Code
-- Codex
-
-安裝後會把公開核心放進目標 Repository 的：
-
-```text
-.ai-agent-architecture/
-├── agents/
-├── skills/
-├── docs/
-├── adapter/
-├── PRIVACY.md
-└── INSTALL-METADATA
-```
-
-並依 Adapter 建立入口：
-
-```text
-Claude Code → CLAUDE.md
-Codex       → AGENTS.md
-```
-
-同一個 `.ai-agent-architecture/` installation **一次只管理一個 Adapter**。若要從 Claude Code 切換到 Codex，或反向切換，必須先執行 uninstall，再安裝另一個 Adapter；安裝器不會在同一 namespace 隱性保留雙入口。
+同一個 `.ai-agent-architecture/` installation 一次只管理一個 Adapter。切換 Adapter 前必須先 uninstall，避免留下 orphan entry 或雙入口。
 
 ## 快速安裝
-
-PR 合併後可直接：
 
 ```bash
 git clone https://github.com/sodahsu/ai-agent-architecture.git
 cd ai-agent-architecture
 ```
 
-安裝 Claude Code Adapter：
+Claude Code：
 
 ```bash
 bash scripts/install.sh --adapter claude-code --target /path/to/project
 ```
 
-安裝 Codex Adapter：
+Codex：
 
 ```bash
 bash scripts/install.sh --adapter codex --target /path/to/project
 ```
 
-也可以在目標專案內執行：
-
-```bash
-bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target .
-```
-
 ## 安裝內容
 
-安裝器只複製公開、安全的核心內容：
+```text
+.ai-agent-architecture/
+├── agents/
+├── skills/
+├── docs/
+│   ├── architecture/
+│   └── governance/
+├── adapter/
+├── PRIVACY.md
+├── LICENSE
+└── INSTALL-METADATA
+```
 
-- `agents/`
-- `skills/`
-- `docs/architecture/`
-- `docs/governance/`
-- 對應 Adapter 文件
-- `PRIVACY.md`
+`LICENSE` 會跟著 Public Core 一起安裝，以保留 MIT License 的 copyright / permission notice。
 
-不會複製：
+不會複製 Personal Memory、Credential、Private Repository metadata、Account / Device identifier、Production configuration 或使用者本機私人設定。
 
-- Personal Memory
-- Credential / Secret
-- Private Repository metadata
-- Account / Email / Device identifier
-- Production configuration
-- 使用者本機私人設定
+## Managed Namespace
 
-`INSTALL-METADATA` 只記錄公開專案識別、schema version 與 adapter 類型；**不會寫入 installer 所在機器的絕對路徑**。
+`.ai-agent-architecture/` 是由 installer 管理的 namespace。重新安裝會更新其中的 Public Core，uninstall 會移除整個 namespace。
 
-## 既有入口檔處理
+**不要把自己的文件、Secret 或客製設定存進 `.ai-agent-architecture/`。** 專案自己的規則應留在既有 `CLAUDE.md` / `AGENTS.md` 或其他專案設定中。
+
+## 入口檔保護
 
 ### 入口不存在
 
-安裝器會建立由本專案管理、帶有 marker 的入口：
+安裝器會建立帶有 managed marker 的 `CLAUDE.md` 或 `AGENTS.md`。
 
-- Claude Code：`CLAUDE.md`
-- Codex：`AGENTS.md`
+### 入口已存在、已修改或是 symlink
 
-### 入口已存在或被修改
-
-安裝器採 fail-safe 行為：
-
-- 使用者原本就存在的入口 → 永不覆蓋
-- 本專案先前建立、但之後被使用者修改的入口 → 永不覆蓋
-- symlinked `CLAUDE.md` / `AGENTS.md` → 永不沿 symlink 寫入
-
-上述情況都會產生整合片段：
+安裝器不覆蓋，改產生：
 
 ```text
 .ai-agent-architecture/CLAUDE.integration.md
@@ -110,42 +75,32 @@ bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target 
 .ai-agent-architecture/AGENTS.integration.md
 ```
 
-使用者可自行把其中規則併入既有入口。
+使用者自行決定是否整合。
 
 ### 未修改的 managed entry
 
-只有當現有 entry 與前一次安裝在 `.ai-agent-architecture/adapter/` 的版本完全相同時，重新安裝才會自動更新 entry。
-
-這避免「只因為還保留 managed marker，就把使用者後續修改覆蓋掉」。
+只有當入口內容與上一次安裝的 Adapter entry 完全相同，重新安裝才會自動更新。
 
 ## 更新
 
-重新執行**相同 Adapter** 的安裝指令即可更新 `.ai-agent-architecture/` 內的公開核心。
+重新執行相同 Adapter 的 install 指令即可。
 
-入口檔處理規則保持不變：
-
-- 未修改的 managed entry → 可自動更新
-- 已修改的 managed entry → 保留並產生 Integration Template
-- 使用者原有 entry → 永不覆蓋
-
-若現有 `INSTALL-METADATA` 顯示另一個 Adapter，installer 會拒絕切換。請先：
+若目前 metadata 顯示不同 Adapter，installer 會拒絕切換。先執行：
 
 ```bash
 bash scripts/uninstall.sh --target /path/to/project
 ```
 
-再安裝新的 Adapter。
+再安裝另一個 Adapter。
 
-## Symlink 安全邊界
+## Symlink 邊界
 
-下列 managed path 若是 symbolic link，安裝器會 fail closed：
+下列情況 fail closed：
 
-- `.ai-agent-architecture`
-- `.ai-agent-architecture/INSTALL-METADATA`
+- `.ai-agent-architecture` 是 symlink
+- `.ai-agent-architecture/INSTALL-METADATA` 是 symlink
 
-另外，若 `CLAUDE.md` / `AGENTS.md` 本身是 symlink，安裝器會保留它，不沿 symlink 寫入，並改產生 Integration Template。
-
-理由：managed namespace 不應透過 symlink 把寫入範圍延伸到 target repository 外部。
+若 `CLAUDE.md` / `AGENTS.md` 本身是 symlink，安裝器保留它與其 target，不沿 symlink 寫入，改產生 Integration Template。
 
 ## 解除安裝
 
@@ -156,44 +111,64 @@ bash scripts/uninstall.sh --target /path/to/project
 解除安裝會：
 
 1. 移除 `.ai-agent-architecture/` managed namespace。
-2. 只有當 `CLAUDE.md` / `AGENTS.md` 同時具備 managed marker，且內容與目前安裝的 adapter entry **完全相同**時，才移除入口檔。
-3. 任何已修改的 managed entry、使用者原有 entry 或 symlinked entry 都保留。
+2. 只有當 managed `CLAUDE.md` / `AGENTS.md` 仍與安裝版本完全相同時才移除入口。
+3. 已修改、使用者原有或 symlinked entry 一律保留。
 
-若 `.ai-agent-architecture` 是 symbolic link 或非目錄物件，解除安裝會 fail closed，不沿該路徑操作。
+## Metadata
+
+`INSTALL-METADATA` 只包含：
+
+```text
+project=ai-agent-architecture
+schema_version=1
+adapter=<claude-code|codex>
+```
+
+不寫入 installer 所在機器的絕對路徑、Hostname、Account Identifier 或 Secret。
 
 ## 自測
 
-Repository 維護者或使用者可以執行：
+Installer / Uninstaller regression：
 
 ```bash
 bash scripts/test-install.sh
 ```
 
-測試會使用暫存資料夾驗證：
-
-- Claude Code 新專案可正常安裝
-- 未修改 managed entry 可安全更新
-- 已修改 managed entry 不會被更新或解除安裝誤刪
-- Codex 既有 `AGENTS.md` 不會被覆蓋
-- Integration Template 能正確產生
-- `.ai-agent-architecture` symlink 會被拒絕
-- symlinked entry 不會被覆蓋
-- symlinked metadata 不會被讀取或改寫
-- Adapter 不可在未 uninstall 前直接切換
-- Metadata 不含來源機器絕對路徑
-- 缺少必要參數時會安全失敗
-
-維護者的完整本機檢查入口：
+維護者完整檢查：
 
 ```bash
 bash scripts/check.sh
 ```
 
-它會執行 shell syntax、安裝回歸測試、Privacy Check 與 Agent / Skill Contract 結構檢查。
+目前檔案 Privacy Check：
+
+```bash
+bash scripts/privacy-check.sh
+```
+
+Git 歷史 Privacy Check（需在 Git worktree）：
+
+```bash
+bash scripts/privacy-history-check.sh
+```
+
+回歸測試涵蓋：
+
+- fresh install
+- Public Agent / Skill package copy
+- MIT License notice copy
+- safe managed-entry update
+- modified entry preservation
+- existing entry preservation
+- namespace / metadata symlink rejection
+- entry symlink preservation
+- adapter-switch rejection
+- privacy-safe metadata
+- uninstall safety
 
 ## 安全原則
 
-安裝器不蒐集、不上傳目標 Repository 的內容，也不會：
+Installer 不會：
 
 - 呼叫外部 API
 - 讀取 Secret
@@ -202,4 +177,4 @@ bash scripts/check.sh
 - 安裝第三方套件
 - 執行 Production Deployment
 
-為判斷既有入口是否可安全自動更新，安裝器只會在目標 repository 內比較現有 `CLAUDE.md` / `AGENTS.md` 與前一次安裝的 adapter entry；不會把內容送出本機。
+Installer 的安全邊界主要保護「目標 Repository 外部路徑」與「使用者入口檔」。`.ai-agent-architecture/` 本身是可替換的 managed namespace，不提供任意使用者資料保存保證。
