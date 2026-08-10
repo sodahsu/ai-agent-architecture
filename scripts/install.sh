@@ -102,7 +102,7 @@ fi
 
 mkdir -p "$DEST"
 rm -rf "$DEST/agents" "$DEST/skills" "$DEST/docs" "$DEST/adapter"
-rm -f "$DEST/PRIVACY.md" "$METADATA" "$INTEGRATION_TARGET"
+rm -f "$DEST/PRIVACY.md" "$DEST/LICENSE" "$METADATA" "$INTEGRATION_TARGET"
 
 cp -R "$REPO_ROOT/agents" "$DEST/agents"
 cp -R "$REPO_ROOT/skills" "$DEST/skills"
@@ -111,6 +111,7 @@ cp -R "$REPO_ROOT/docs/architecture" "$DEST/docs/architecture"
 cp -R "$REPO_ROOT/docs/governance" "$DEST/docs/governance"
 cp -R "$REPO_ROOT/adapters/$ADAPTER" "$DEST/adapter"
 cp "$REPO_ROOT/PRIVACY.md" "$DEST/PRIVACY.md"
+cp "$REPO_ROOT/LICENSE" "$DEST/LICENSE"
 
 if [[ ! -e "$ENTRY_TARGET" && ! -L "$ENTRY_TARGET" ]]; then
   cp "$ENTRY_SOURCE" "$ENTRY_TARGET"
