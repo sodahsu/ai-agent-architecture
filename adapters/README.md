@@ -42,6 +42,25 @@ Adapter 只回答三件事：
 | Governance | 共用根目錄文件 | 共用根目錄文件 |
 | 真相源 | `agents/` + `skills/` | `agents/` + `skills/` |
 
+## 安裝
+
+使用根目錄安裝器：
+
+```bash
+bash scripts/install.sh --adapter claude-code --target /path/to/project
+bash scripts/install.sh --adapter codex --target /path/to/project
+```
+
+公開核心會安裝至：
+
+```text
+.ai-agent-architecture/
+```
+
+如果目標專案已有 `CLAUDE.md` 或 `AGENTS.md`，安裝器不覆蓋，改產生 Integration Template。
+
+完整說明見 `INSTALL.md`。
+
 ## 避免 Drift
 
 Adapter 不應重新描述完整 Skill Procedure。若平台需要特殊行為，只能補充「如何載入、如何呼叫、平台特有限制」。
