@@ -6,26 +6,65 @@
 
 > **核心原則：公開方法，不公開私人 AI 大腦。**
 
+## 先理解架構層級
+
+這個專案包含六倉、Agent、Skill、Governance、Workflow、Artifact 等概念，但它們**不是同一層級**。
+
+```text
+Level 0  系統邊界
+         Private / Public
+
+Level 1  Repository Architecture
+         六倉＝系統級責任分區
+
+Level 2  Operating Model
+         Agent / Skill / Tool＝倉內如何判斷與執行
+
+         Governance＝橫跨所有層級的控制面
+
+Level 3  Workflow
+         Intent → Context → Routing → Execution → Validation → Approval → Handoff
+
+Level 4  Artifact / Contract
+         不同角色與 Repository 之間交換資訊的介面
+```
+
+最重要的區分是：
+
+```text
+Repository  = 責任放在哪裡
+Agent       = 誰負責判斷與協調
+Skill       = 怎麼按照穩定程序執行
+Tool        = 實際對外部系統產生操作
+Workflow    = 工作按照什麼順序流動
+Artifact    = 不同角色之間交換什麼
+Governance  = 以上所有行為哪些被允許
+```
+
+完整說明見 [架構層級模型](docs/architecture/layer-model.md)。
+
 ## 從這裡開始
 
 建議閱讀順序：
 
-1. [架構視覺圖](docs/architecture/visual-map.md) — 先看整體系統、邊界與控制迴路。
-2. [六倉架構模式](docs/architecture/six-repository-pattern.md) — 將知識、代理控制、評估、執行、實驗與作品集責任拆開。
-3. [跨倉資料流](docs/architecture/data-flow.md) — 定義哪些 artifact 可以跨倉交換，以及哪些資訊必須保持私有。
-4. [Agent / Skill / Governance 模型](docs/architecture/agent-skill-governance.md) — 分離判斷、可重複程序、權限與批准機制。
-5. [Agent 工作方法](docs/methodology/agent-workflow.md) — 目標 → 路由 → 執行 → 驗證 → 批准 → 交接。
-6. [匿名功能交付範例](examples/feature-delivery.md) — 使用完全虛構的情境走完一次完整流程。
-7. [公開／私有邊界](docs/governance/public-private-boundary.md) — 如何把私人實作經驗萃取成可公開的方法。
-8. [隱私規範](PRIVACY.md) — 明確列出不可提交到公開 repository 的內容。
+1. [架構層級模型](docs/architecture/layer-model.md) — 先理解六倉、Agent、Skill、Governance、Workflow、Artifact 彼此的上下層關係。
+2. [架構視覺圖](docs/architecture/visual-map.md) — 看整體系統、公開／私有邊界與控制迴路。
+3. [六倉架構模式](docs/architecture/six-repository-pattern.md) — 將知識、代理控制、評估、執行、實驗與作品集責任拆開。
+4. [跨倉資料流](docs/architecture/data-flow.md) — 定義哪些 artifact 可以跨倉交換，以及哪些資訊必須保持私有。
+5. [Agent / Skill / Governance 模型](docs/architecture/agent-skill-governance.md) — 分離判斷、可重複程序、工具權限與批准機制。
+6. [Agent 工作方法](docs/methodology/agent-workflow.md) — 目標 → 路由 → 執行 → 驗證 → 批准 → 交接。
+7. [匿名功能交付範例](examples/feature-delivery.md) — 使用完全虛構的情境走完一次完整流程。
+8. [公開／私有邊界](docs/governance/public-private-boundary.md) — 如何把私人實作經驗萃取成可公開的方法。
+9. [隱私規範](PRIVACY.md) — 明確列出不可提交到公開 repository 的內容。
 
 ## 這個 repository 要說明什麼
 
 - 如何把私人記憶與公開架構分離
-- Agent、Skill、Workflow 與 Governance 如何分工
+- 六倉的責任層級與彼此邊界
+- Agent、Skill、Tool、Workflow 與 Governance 如何分工
 - 如何在多個 AI Agent 之間派工，而不是把所有權限交給每一個 Agent
-- 如何透過明確 artifact 交換上下文，而不是直接傾倒完整記憶
-- 如何建立 handoff、review gate 與 human approval 邊界
+- 如何透過明確 Artifact Contract 交換上下文，而不是直接傾倒完整記憶
+- 如何建立 Handoff、Review Gate 與 Human Approval 邊界
 - 如何在新 Skill 或外部工具進入穩定工作流之前先做評估
 - 如何分離同步互動、非同步執行、知識、實驗、發布與作品集層
 - 如何把私人運作經驗轉成不含個資的公開模式與範例
@@ -59,23 +98,39 @@ flowchart TB
     L -->|精選證據| P
 ```
 
-六個 repository 代表的是**架構角色**，不是強制要求使用固定名稱。真正重要的是責任、資訊流與權限邊界。
+六個 repository 代表的是**Level 1 的架構角色**，不是六個 Workflow Step，也不是六個 Agent。真正重要的是責任、資訊流與權限邊界。
 
-## 三個核心關注點
+## 倉內運作模型
+
+當任務進入 Agent Control / Execution 之後，才進入 Level 2：
 
 ```text
-Agent       = 判斷與協調
-Skill       = 可重複的執行契約
-Governance  = 權限、風險、驗證與批准
+Agent
+  ↓ 選擇 / 協調
+Skill
+  ↓ 使用
+Tool
+  ↓
+Files / APIs / Git / Browser / Test Runner
 ```
 
-一個能力很強的 Agent，不代表它自動擁有所有操作權。Governance 必須限制 Agent 與 Skill 可以讀取、寫入、安裝、合併、發布或部署的範圍。
+Governance 不在這條線的最後，而是從旁限制整條鏈：
+
+```text
+                 Governance
+        ┌────────────┼────────────┐
+        ↓            ↓            ↓
+      Agent        Skill         Tool
+```
+
+因此，一個能力很強的 Agent，不代表它自動擁有所有操作權。
 
 ## Repository 結構
 
 ```text
 docs/
 ├── architecture/
+│   ├── layer-model.md
 │   ├── visual-map.md
 │   ├── six-repository-pattern.md
 │   ├── system-overview.md
@@ -117,6 +172,8 @@ Reviewable Output
 Sanitized Learning
 ```
 
+這條流程描述的是 **Level 3 Workflow**；其中的 `Context Contract`、`Assignment Brief`、`Execution Evidence` 等則屬於 **Level 4 Artifact Contract**。
+
 ## 隱私規則
 
 禁止提交：
@@ -135,4 +192,14 @@ Sanitized Learning
 
 ## 目前狀態
 
-目前已定義第一版公開參考架構，包括六倉模式、跨倉資料流、Agent / Skill / Governance 模型、隱私邊界與第一個匿名端到端範例。可執行工具應等這些契約穩定後再加入，避免方法論還未定型就綁死實作。
+目前已定義第一版公開參考架構，包括：
+
+- 架構層級模型
+- 六倉責任模式
+- 公開／私有邊界
+- 跨倉資料流
+- Agent / Skill / Tool / Governance 模型
+- Workflow 與 Artifact Contract
+- 第一個匿名端到端範例
+
+可執行工具應等這些契約穩定後再加入，避免方法論還未定型就綁死實作。
