@@ -20,12 +20,19 @@ SWITCH_TARGET="$TMP/switch-project"
 METADATA_LINK_TARGET="$TMP/metadata-link-project"
 mkdir -p "$CLAUDE_TARGET" "$CODEX_TARGET" "$SYMLINK_TARGET" "$ENTRY_LINK_TARGET" "$SWITCH_TARGET" "$METADATA_LINK_TARGET"
 
-# Fresh Claude install creates a managed entry and privacy-safe metadata.
+# Fresh Claude install creates a managed entry and the complete public package.
 bash "$INSTALL" --adapter claude-code --target "$CLAUDE_TARGET" >/dev/null
 [[ -f "$CLAUDE_TARGET/CLAUDE.md" ]]
 grep -q '^<!-- ai-agent-architecture-managed -->$' "$CLAUDE_TARGET/CLAUDE.md"
 [[ -f "$CLAUDE_TARGET/.ai-agent-architecture/agents/coordinator.md" ]]
+[[ -f "$CLAUDE_TARGET/.ai-agent-architecture/agents/design-coordinator.md" ]]
+[[ -f "$CLAUDE_TARGET/.ai-agent-architecture/agents/product-coordinator.md" ]]
+[[ -f "$CLAUDE_TARGET/.ai-agent-architecture/agents/people-coordinator.md" ]]
 [[ -f "$CLAUDE_TARGET/.ai-agent-architecture/skills/task-contract/SKILL.md" ]]
+[[ -f "$CLAUDE_TARGET/.ai-agent-architecture/skills/clarify/SKILL.md" ]]
+[[ -f "$CLAUDE_TARGET/.ai-agent-architecture/skills/design-review/SKILL.md" ]]
+[[ -f "$CLAUDE_TARGET/.ai-agent-architecture/skills/code-review/SKILL.md" ]]
+[[ -f "$CLAUDE_TARGET/.ai-agent-architecture/skills/meeting-to-decisions/SKILL.md" ]]
 grep -q '^project=ai-agent-architecture$' "$CLAUDE_TARGET/.ai-agent-architecture/INSTALL-METADATA"
 ! grep -q 'installed_from=' "$CLAUDE_TARGET/.ai-agent-architecture/INSTALL-METADATA"
 ! grep -q "$TMP" "$CLAUDE_TARGET/.ai-agent-architecture/INSTALL-METADATA"
@@ -50,6 +57,7 @@ bash "$INSTALL" --adapter codex --target "$CODEX_TARGET" >/dev/null
 grep -q '^# existing user instructions$' "$CODEX_TARGET/AGENTS.md"
 [[ -f "$CODEX_TARGET/.ai-agent-architecture/AGENTS.integration.md" ]]
 [[ -f "$CODEX_TARGET/.ai-agent-architecture/agents/reviewer.md" ]]
+[[ -f "$CODEX_TARGET/.ai-agent-architecture/skills/skill-audit/SKILL.md" ]]
 bash "$UNINSTALL" --target "$CODEX_TARGET" >/dev/null
 [[ -f "$CODEX_TARGET/AGENTS.md" ]]
 grep -q '^# existing user instructions$' "$CODEX_TARGET/AGENTS.md"
