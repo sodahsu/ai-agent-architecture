@@ -62,4 +62,4 @@ secrets     no
 
 ## Completion Criteria
 
-變更符合 Acceptance Criteria、Validation 通過、Scope 未外溢，且下一個角色可根據 Evidence 獨立審查。
+變更符合 Acceptance Criteria、Validation 通過、Scope 未外溢，且下一個角色可以只依 Evidence 與 Artifact 進行審查，不必依賴實作者的口頭摘要。
