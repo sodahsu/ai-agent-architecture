@@ -4,7 +4,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 
-mapfile -d '' FILES < <(
+FILES=()
+while IFS= read -r -d '' file; do
+  FILES+=("$file")
+done < <(
   find "$REPO_ROOT" -type f \
     ! -path "$REPO_ROOT/.git/*" \
     ! -path "$REPO_ROOT/scripts/privacy-check.sh" \
