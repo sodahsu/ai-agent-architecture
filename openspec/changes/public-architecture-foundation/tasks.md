@@ -12,24 +12,38 @@
 - [x] 擴充 installer boundary tests
 - [x] 新增 `scripts/privacy-check.sh`
 - [x] 新增統一 `scripts/check.sh`
-- [x] 同步 README / INSTALL / PRIVACY 文件
-- [x] 執行 shell syntax check
-- [x] 執行 installer smoke / regression tests
-- [x] 執行 privacy check
-- [x] 執行 contract structure check
-- [x] 最終比對 `main` 與 Draft PR 狀態
+- [x] 建立 Public Capability Catalog
+- [x] 將 Agent 分成 Lifecycle / Domain 兩個維度
+- [x] 公開 Design / Product / People Domain Coordinators
+- [x] 公開 Clarify / Adversarial Review / Roadmap Planning
+- [x] 公開 Design Brief / Review / Spec / System
+- [x] 公開 Code Review / Root Cause / Task Checkpoint / Skill Audit
+- [x] 公開 Meeting to Decisions
+- [x] Public Core 達到 7 Agents / 18 Skills
+- [x] 新增 Public Capability OpenSpec
+- [x] Installer regression test 驗證新增 Agent / Skill 會一起安裝
+- [ ] 同步根 README 的 Public Capability 摘要與數量
+- [ ] 執行 shell syntax check
+- [ ] 執行 installer smoke / regression tests
+- [ ] 執行 privacy check
+- [ ] 執行 contract structure check（含 7 Agents / 18 Skills count）
+- [ ] 最終比對 `main` 與 Draft PR 狀態
 
 ## Verification Notes
 
 - Branch：`feature/public-architecture-foundation`
-- 相對 `main`：`behind 0`
-- Installer / Uninstaller regression fixture：pass
-- Privacy positive check：pass
-- Privacy negative cases（real email / concrete home path / credential-like token）：正確 fail
-- Contract structure check：pass
+- Public Capability Boundary：`docs/governance/public-capability-catalog.md`
+- Public Capability Spec：`specs/public-capabilities/spec.md`
 - GitHub Actions / Deploy / Secret：本次未修改
-- 由於執行環境無法直接對 GitHub 做 network clone，腳本測試使用與 repository 結構等價的 local fixture；GitHub connector 另行核對實際 branch 檔案、PR diff 與 Contract headings。
+- 正式 License：repository `main` 已存在 MIT License；本次不修改 License 內容。
 
-## Out of scope / user decision
+## Keep-private boundary
 
-- [ ] 選定正式開源 License（MIT / Apache-2.0 / other）— 屬於授權決策，不在本次自動決定範圍。
+本次不公開：
+
+- Personal Memory / Personal Assistant / private knowledge bridge
+- 私人發布與個人品牌 Runtime
+- Provider account routing / billing / quota / production deployment
+- Machine-specific sync / bootstrap
+- 真實 People / Employee / Candidate Data
+- 未完成 License / Attribution Review 的第三方 Skill 原文
