@@ -47,8 +47,11 @@ bash scripts/check.sh
 
 - Agent：`agents/`
 - Skill：`skills/`
+- Public / Private capability boundary：`docs/governance/public-capability-catalog.md`
 
 Adapter 只負責平台入口與映射，不應複製完整程序形成第二份真相源。
+
+新增 Public Agent / Skill 前，確認能力不依賴 Personal Memory、Private Repository、Credential、Machine-specific Path 或 Production Runtime 才能成立。
 
 ## Installer 變更
 
@@ -61,4 +64,6 @@ Adapter 只負責平台入口與映射，不應複製完整程序形成第二份
 
 ## License
 
-專案目前尚未選定正式 License。正式 Release 前會由維護者決定授權條款；請勿假設尚未加入的授權條款。
+本專案使用 [MIT License](LICENSE)。提交貢獻即代表該貢獻可依本 repository 的 MIT License 散布。
+
+若內容來自第三方專案，必須在提交前確認其 License 與 Attribution Requirement；不要只因為來源公開就直接 Copy 到 Public Core。
