@@ -16,7 +16,9 @@
 ├── agents/
 ├── skills/
 ├── docs/
-└── adapter/
+├── adapter/
+├── PRIVACY.md
+└── INSTALL-METADATA
 ```
 
 並依 Adapter 建立入口：
@@ -64,6 +66,7 @@ bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target 
 - `docs/architecture/`
 - `docs/governance/`
 - 對應 Adapter 文件
+- `PRIVACY.md`
 
 不會複製：
 
@@ -78,10 +81,12 @@ bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target 
 
 ### 若入口不存在
 
-安裝器會建立：
+安裝器會建立由本專案管理、帶有 marker 的入口：
 
 - Claude Code：`CLAUDE.md`
 - Codex：`AGENTS.md`
+
+之後重新安裝時，只會自動更新帶有本專案 marker 的入口。
 
 ### 若入口已存在
 
@@ -105,7 +110,10 @@ bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target 
 
 重新執行安裝指令即可更新 `.ai-agent-architecture/` 內的公開核心。
 
-入口檔若已存在則仍不覆蓋。
+入口檔處理規則保持不變：
+
+- 本專案管理的入口 → 可安全更新
+- 使用者原有入口 → 永不覆蓋
 
 ## 解除安裝
 
@@ -113,9 +121,26 @@ bash /path/to/ai-agent-architecture/scripts/install.sh --adapter codex --target 
 bash scripts/uninstall.sh --target /path/to/project
 ```
 
-解除安裝只會移除 `.ai-agent-architecture/`。
+解除安裝會：
 
-為避免誤刪使用者原本的設定，`CLAUDE.md` / `AGENTS.md` 不會自動刪除。
+1. 移除 `.ai-agent-architecture/`
+2. 若 `CLAUDE.md` / `AGENTS.md` 明確帶有本專案 managed marker，才會移除
+3. 使用者原本存在的入口檔永遠保留
+
+## 自測
+
+Repository 維護者或使用者可以執行：
+
+```bash
+bash scripts/test-install.sh
+```
+
+測試會使用暫存資料夾驗證：
+
+- Claude Code 新專案可正常安裝與解除安裝
+- Codex 既有 `AGENTS.md` 不會被覆蓋
+- Integration Template 能正確產生
+- 解除安裝不會誤刪使用者既有入口
 
 ## 安全原則
 
