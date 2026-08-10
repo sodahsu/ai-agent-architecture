@@ -33,6 +33,8 @@ grep -q '^<!-- ai-agent-architecture-managed -->$' "$CLAUDE_TARGET/CLAUDE.md"
 [[ -f "$CLAUDE_TARGET/.ai-agent-architecture/skills/design-review/SKILL.md" ]]
 [[ -f "$CLAUDE_TARGET/.ai-agent-architecture/skills/code-review/SKILL.md" ]]
 [[ -f "$CLAUDE_TARGET/.ai-agent-architecture/skills/meeting-to-decisions/SKILL.md" ]]
+[[ -f "$CLAUDE_TARGET/.ai-agent-architecture/LICENSE" ]]
+grep -q '^MIT License$' "$CLAUDE_TARGET/.ai-agent-architecture/LICENSE"
 grep -q '^project=ai-agent-architecture$' "$CLAUDE_TARGET/.ai-agent-architecture/INSTALL-METADATA"
 ! grep -q 'installed_from=' "$CLAUDE_TARGET/.ai-agent-architecture/INSTALL-METADATA"
 ! grep -q "$TMP" "$CLAUDE_TARGET/.ai-agent-architecture/INSTALL-METADATA"
@@ -58,6 +60,7 @@ grep -q '^# existing user instructions$' "$CODEX_TARGET/AGENTS.md"
 [[ -f "$CODEX_TARGET/.ai-agent-architecture/AGENTS.integration.md" ]]
 [[ -f "$CODEX_TARGET/.ai-agent-architecture/agents/reviewer.md" ]]
 [[ -f "$CODEX_TARGET/.ai-agent-architecture/skills/skill-audit/SKILL.md" ]]
+[[ -f "$CODEX_TARGET/.ai-agent-architecture/LICENSE" ]]
 bash "$UNINSTALL" --target "$CODEX_TARGET" >/dev/null
 [[ -f "$CODEX_TARGET/AGENTS.md" ]]
 grep -q '^# existing user instructions$' "$CODEX_TARGET/AGENTS.md"
