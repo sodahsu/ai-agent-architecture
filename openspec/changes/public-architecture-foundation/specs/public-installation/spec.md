@@ -34,6 +34,18 @@
 - WHEN 重新安裝
 - THEN MAY 自動更新成新版本
 
+## Requirement: Single adapter per managed namespace
+
+同一個 `.ai-agent-architecture` installation MUST 一次只管理一個 Adapter，避免留下 orphan entry 或雙入口狀態。
+
+### Scenario: Adapter switch without uninstall
+
+- GIVEN 目前 metadata 顯示已安裝 `claude-code`
+- WHEN 使用者直接要求安裝 `codex`
+- THEN installer MUST fail closed
+- AND 原本 installation 與 `CLAUDE.md` MUST 保持不變
+- AND 使用者應先執行 uninstall，再安裝另一個 Adapter
+
 ## Requirement: Safe uninstall
 
 解除安裝 MUST NOT 只因存在 managed marker 就刪除 entry。
@@ -53,7 +65,7 @@
 
 ## Requirement: Symlink boundary
 
-安裝器與解除安裝器 MUST NOT 透過 `.ai-agent-architecture` symlink 對 target repository 外的路徑執行讀寫。
+安裝器與解除安裝器 MUST NOT 透過 managed symlink 對 target repository 外的路徑執行讀寫。
 
 ### Scenario: Managed namespace is a symlink
 
@@ -68,6 +80,13 @@
 - WHEN install
 - THEN MUST preserve symlink 與其 target
 - AND 產生 integration template
+
+### Scenario: Metadata is a symlink
+
+- GIVEN `.ai-agent-architecture/INSTALL-METADATA` 是 symbolic link
+- WHEN install
+- THEN MUST fail closed before reading or replacing metadata
+- AND MUST NOT 修改 symlink target
 
 ## Requirement: Local verification
 
