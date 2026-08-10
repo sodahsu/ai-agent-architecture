@@ -6,9 +6,11 @@
 
 > **核心原則：公開方法，不公開私人 AI 大腦。**
 
+目前 Public Core 包含 **7 個 Agent Contract + 18 個 Skill Contract**，支援 Claude Code 與 Codex Adapter。
+
 ## 快速安裝
 
-目前支援 Claude Code 與 Codex。安裝器仍在 Draft PR 分支中；合併到 `main` 後即可從公開預設分支安裝。
+安裝器仍在 Draft PR 分支中；合併到 `main` 後即可從公開預設分支安裝。
 
 ```bash
 git clone https://github.com/sodahsu/ai-agent-architecture.git
@@ -44,7 +46,7 @@ bash scripts/check.sh
 - Shell syntax check
 - Installer / Uninstaller regression tests
 - Privacy leak pattern check
-- Agent / Skill Contract 結構檢查
+- 7 個 Agent / 18 個 Skill Contract 結構與數量檢查
 - OpenSpec / 必要文件存在性檢查
 
 單獨測試：
@@ -134,7 +136,9 @@ Governance 不是最後一步，而是從旁限制整條鏈：
 
 ## 可公開使用的 Agents
 
-[`agents/`](agents/README.md) 提供四個平台中立角色契約：
+[`agents/`](agents/README.md) 提供 **7 個平台中立 Agent Contract**，分成兩個維度。
+
+### Lifecycle Agents
 
 ```text
 Coordinator  → Goal、Scope、Routing、Assignment、Approval Gate
@@ -143,17 +147,46 @@ Reviewer     → Read-only 獨立驗證 Acceptance Criteria 與 Evidence
 Evaluator    → 評估 Skill / Tool / MCP 的 adopt / adapt / reject / defer
 ```
 
-## 可公開使用的 Skills
-
-[`skills/`](skills/README.md) 目前提供：
+### Domain Agents
 
 ```text
-task-contract           → 模糊需求轉成可執行契約
-bounded-implementation  → 最小、安全、可逆實作
-evidence-review         → 依 Evidence 與驗收條件審查
-privacy-sanitizer       → 私人經驗去識別化成公開方法
-handoff                 → 產出下一角色可直接接手的狀態
-capability-evaluation   → 評估新 AI 能力的採用與晉升條件
+Design Coordinator   → Design Brief / Review / Spec / System 路由
+Product Coordinator  → Product Goal / Roadmap / Decision / Requirement 路由
+People Coordinator   → People 工作的最小 Context、Privacy 與 Human Decision Gate
+```
+
+Domain Agent 負責專業領域判斷，不因此自動取得 Implementer 寫入權。
+
+## 可公開使用的 Skills
+
+[`skills/`](skills/README.md) 目前提供 **18 個 Public Skills**：
+
+```text
+Core / Governance
+├─ clarify
+├─ task-contract
+├─ bounded-implementation
+├─ evidence-review
+├─ adversarial-review
+├─ privacy-sanitizer
+├─ handoff
+└─ capability-evaluation
+
+Product / Knowledge
+├─ roadmap-planning
+└─ meeting-to-decisions
+
+Design
+├─ design-brief
+├─ design-review
+├─ design-spec
+└─ design-system
+
+Engineering / Operations
+├─ code-review
+├─ root-cause
+├─ task-checkpoint
+└─ skill-audit
 ```
 
 每個 Skill 都定義：
@@ -171,6 +204,8 @@ Completion Criteria
 ```
 
 Skill Contract 是程序真相源，不綁定特定模型供應商。
+
+哪些能力適合 Public Core、哪些必須先 Adapt、哪些應保持 Private，見 [Public Capability Catalog](docs/governance/public-capability-catalog.md)。
 
 ## Adapter Layer
 
@@ -230,12 +265,14 @@ Sanitized Learning
 
 本專案本身刻意公開的 repository 名稱與 Clone URL 可用於安裝文件；不應藉此加入其他私人識別資訊。
 
-詳細規則見 [PRIVACY.md](PRIVACY.md) 與 [Public / Private Boundary](docs/governance/public-private-boundary.md)。
+詳細規則見 [PRIVACY.md](PRIVACY.md)、[Public / Private Boundary](docs/governance/public-private-boundary.md) 與 [Public Capability Catalog](docs/governance/public-capability-catalog.md)。
 
 ## Repository 結構
 
 ```text
 AGENTS.md
+CONTRIBUTING.md
+LICENSE
 README.md
 INSTALL.md
 PRIVACY.md
@@ -267,7 +304,7 @@ openspec/
 
 ## 開發規範
 
-維護本專案時先讀 [AGENTS.md](AGENTS.md)。非簡單架構、Governance、Installer 或 Agent / Skill Contract 變更，應同步更新 [`openspec/`](openspec/project.md)。
+維護本專案時先讀 [AGENTS.md](AGENTS.md) 與 [CONTRIBUTING.md](CONTRIBUTING.md)。非簡單架構、Governance、Installer 或 Agent / Skill Contract 變更，應同步更新 [`openspec/`](openspec/project.md)。
 
 基本原則：
 
@@ -276,6 +313,7 @@ openspec/
 - Public-safe synthetic examples only
 - 相關測試與 Privacy Check 通過後才進人工 merge review
 - 不自動 Merge / Deploy / Secret / Billing / destructive action
+- 第三方能力先做 License / Attribution Review，不直接 Copy
 
 ## 建議閱讀順序
 
@@ -286,31 +324,32 @@ openspec/
 5. [Agent / Skill / Governance 模型](docs/architecture/agent-skill-governance.md)
 6. [公開 Agent 套件](agents/README.md)
 7. [公開 Skill 套件](skills/README.md)
-8. [Adapter Layer](adapters/README.md)
-9. [安裝指南](INSTALL.md)
-10. [Agent 工作方法](docs/methodology/agent-workflow.md)
-11. [匿名功能交付範例](examples/feature-delivery.md)
-12. [公開／私有邊界](docs/governance/public-private-boundary.md)
-13. [隱私規範](PRIVACY.md)
+8. [Public Capability Catalog](docs/governance/public-capability-catalog.md)
+9. [Adapter Layer](adapters/README.md)
+10. [安裝指南](INSTALL.md)
+11. [Agent 工作方法](docs/methodology/agent-workflow.md)
+12. [匿名功能交付範例](examples/feature-delivery.md)
+13. [公開／私有邊界](docs/governance/public-private-boundary.md)
+14. [隱私規範](PRIVACY.md)
 
 ## 目前狀態
 
 第一版已包含：
 
 - 架構層級模型與六倉責任模式
-- Public / Private Boundary
+- Public / Private Boundary 與 Public Capability Catalog
 - Cross-Repository Data Flow
 - Agent / Skill / Tool / Governance 模型
-- 4 個公開 Agent Contract
-- 6 個公開 Skill Contract
+- 4 個 Lifecycle Agent + 3 個 Domain Agent
+- 18 個 Public Skill Contract
 - Claude Code / Codex Adapter
 - 安裝、更新、解除安裝與回歸測試
 - Privacy Check 與統一 Validation Entry
 - OpenSpec project / change baseline
 - Synthetic end-to-end example
 
-目前不包含真實 Production Runtime、私人系統設定或 Credential。
+目前不包含真實 Production Runtime、私人系統設定、Credential、Personal Memory 或 Private People Data。
 
-### License 狀態
+## License
 
-正式對外 Release 前仍需選定 License。這是法律／授權決策，本專案目前不預設 MIT、Apache-2.0 或其他授權條款。
+本專案採用 [MIT License](LICENSE)。其他人可以依授權條款使用、修改與散布；第三方貢獻仍需自行確認其來源 License / Attribution Requirement。
