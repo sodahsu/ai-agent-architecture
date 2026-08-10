@@ -8,7 +8,7 @@
 
 ## 快速安裝
 
-目前支援 Claude Code 與 Codex。
+目前支援 Claude Code 與 Codex。安裝器目前仍在 Draft PR 分支中，**合併到 `main` 後即可直接從公開預設分支安裝**。
 
 ```bash
 git clone https://github.com/sodahsu/ai-agent-architecture.git
