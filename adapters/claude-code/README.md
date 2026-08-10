@@ -1,51 +1,36 @@
 # Claude Code Adapter
 
-這個 Adapter 示範如何把平台中立的 Agent / Skill Contract 接到 Claude Code。
+這個 Adapter 把平台中立的 Agent / Skill Contract 接到 Claude Code；它只做平台入口與載入，不維護第二份 capability inventory。
 
-## 角色
-
-Claude Code Adapter 只負責：
-
-- 讀取 `CLAUDE.md` 作為專案入口規則
-- 依任務選擇 `agents/` 中的角色契約
-- 依角色與任務讀取 `skills/<name>/SKILL.md`
-- 套用 Governance、Permission、Validation 與 Human Approval Gate
-
-核心 Agent 與 Skill 仍以 repository 根目錄為唯一真相源。
-
-## 建議讀取順序
+## 讀取順序
 
 安裝後：
 
 ```text
 CLAUDE.md
   ↓
-.ai-agent-architecture/docs/architecture/layer-model.md
+.ai-agent-architecture/agents/README.md
+.ai-agent-architecture/skills/README.md
   ↓
-.ai-agent-architecture/agents/<role>.md
-  ↓
-.ai-agent-architecture/skills/<name>/SKILL.md
+選定 Agent / Skill Contract
   ↓
 Governance / Privacy Rules
 ```
 
-## 角色映射
+完整 Agent 索引以 `agents/README.md` 為準，完整 Skill 索引以 `skills/README.md` 為準。不要在 Adapter 裡重複列出所有角色或 Skill，避免 Public Core 擴充後發生 drift。
 
-| 公開角色 | Claude Code 中的用途 |
-|---|---|
-| Coordinator | orchestration、拆解、Routing、Assignment |
-| Implementer | bounded implementation |
-| Reviewer | read-only independent review |
-| Evaluator | 外部 Skill / MCP / Tool 評估 |
+## Review 語意
 
-Claude Code 可以使用 native agent / subagent 能力實作這些角色，但平台能力不是核心架構的一部分。即使沒有 subagent 功能，也可以在單一 session 依角色契約序列執行。
+Claude Code 若能提供彼此隔離的 subagent / context，可以把 Reviewer 用於真正的 independent review。
+
+若只在同一 session 切換 Reviewer 視角，仍可依 Reviewer Contract 做 Evidence Review，但必須標記為 `structured-self-review`，不能宣稱具備獨立驗證的強度。
 
 ## Skill Routing
 
-非簡單任務應先確認是否有對應 Skill：
-
 ```text
 理解任務
+  ↓
+讀 skills/README.md
   ↓
 選擇最小匹配 Skill
   ↓
@@ -60,20 +45,14 @@ Claude Code 可以使用 native agent / subagent 能力實作這些角色，但�
 
 不要因為 Claude Code 能執行 Shell、Git 或其他工具，就跳過 Skill Contract 的 Permission Boundary。
 
-## 安裝方式
+## 安裝
 
 ```bash
 bash scripts/install.sh --adapter claude-code --target /path/to/project
 ```
 
-安裝器會：
-
-1. 把公開核心放進 `.ai-agent-architecture/`
-2. 若專案沒有 `CLAUDE.md`，建立受管理入口
-3. 若已有 `CLAUDE.md`，保留原檔並產生 `.ai-agent-architecture/CLAUDE.integration.md`
-
-不會自動 Commit、Push 或修改 Git remote。
+安裝器會把 Public Core、Privacy Policy 與 MIT License 放進 `.ai-agent-architecture/`。若目標已有 `CLAUDE.md`，保留原檔並建立 Integration Template；不自動 Commit、Push 或修改 Git remote。
 
 ## 隱私
 
-不要把私人 Memory、帳號資訊、本機絕對路徑或 Secret 寫進公開 `CLAUDE.md`。專案專屬敏感資訊應留在私有設定層，並只透過必要的 Context Contract 提供給任務。
+私人 Memory、帳號資訊、本機絕對路徑、Credential 或 Production Context 不進 Public Core。專案專屬 Context 只透過當前任務所需的最小 Context Contract 提供。
